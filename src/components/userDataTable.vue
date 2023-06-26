@@ -1,60 +1,73 @@
 <template>
-  <div class="container1">
-    <side-bar class="sidebar_1"></side-bar>
-    <div class="button">
-      <button class="btn btn-large btn-success" type="submit" @click="addUser">
-        <font-awesome-icon icon="fa-solid fa-user-plus" class="font1" />
-        Add_User
-      </button>
-      <!-- <button
-        class="btn btn-large btn-success"
-        type="submit"
-        @click="deleteSelected_User"
-      >
-        <font-awesome-icon icon="fa-solid fa-user-minus" class="font1" />
-        DeleteSeletected_User
-      </button> -->
+  <div class="container_main">
+    <div class="sidebar">
+      <side-bar></side-bar>
     </div>
-    <div class="table-container">
-      <table border="2" class="styled-table">
-        <thead>
-          <tr>
-            <th>
-              <input
-                type="checkbox"
-                v-model="selectAllRows"
-                @change="toggleAllCheckboxes"
-              />
-            </th>
-            <th>FirstName</th>
-            <th>LastName</th>
-            <th>Email</th>
-            <th>User-Name</th>
-            <th>Phone</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="user in users" :key="user.id">
-            <td>
-              <input type="checkbox" :value="user.id" v-model="selected" />
-            </td>
-            <td>{{ user.first_name }}</td>
-            <td>{{ user.last_name }}</td>
-            <td>{{ user.email }}</td>
-            <td>{{ user.username }}</td>
-            <td>{{ user.phone_number }}</td>
-            <td>
-              <button class="btn1" @click="editUserData(user)">
-                <font-awesome-icon icon="fa-solid fa-edit" />
-              </button>
-              <button class="btn2" @click="deleteUser(user.id)">
-                <font-awesome-icon icon="fa-solid fa-trash" />
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="content">
+      <div class="top-section">
+        <div class="button-container">
+          <button
+            class="btn btn-large btn-success"
+            id="btn1"
+            type="submit"
+            @click="addUser"
+            style="font-size: 144%; margin-left: -70%"
+          >
+            <!-- <font-awesome-icon icon="fa-solid fa-user-plus" class="font1" /> -->
+            Add User</button
+          ><button
+            class="btn btn-large btn-danger"
+            id="btn2"
+            type="submit"
+            @click="deleteUser(0)"
+            style="font-size: 144%; margin-left: 10%"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+      <!-- <div class="table-container"> -->
+      <div class="bottom-section">
+        <table border="2" class="styled-table">
+          <thead>
+            <tr>
+              <th>
+                <input
+                  type="checkbox"
+                  v-model="selectAllRows"
+                  @change="toggleAllCheckboxes"
+                />
+              </th>
+              <th>FirstName</th>
+              <th>LastName</th>
+              <th>Email</th>
+              <th>User-Name</th>
+              <th>Phone</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="user in users" :key="user.id">
+              <td>
+                <input type="checkbox" :value="user.id" v-model="selected" />
+              </td>
+              <td>{{ user.first_name }}</td>
+              <td>{{ user.last_name }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ user.username }}</td>
+              <td>{{ user.phone_number }}</td>
+              <td>
+                <button class="btn1" @click="editUserData(user)">
+                  <font-awesome-icon icon="fa-solid fa-edit" />
+                </button>
+                <button class="btn2" @click="deleteUser(user.id)">
+                  <font-awesome-icon icon="fa-solid fa-trash" />
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </template>
@@ -62,7 +75,8 @@
 <script>
 import axios from "axios";
 import SideBar from "../sidebar_File/sideBar.vue";
-
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 export default {
   components: {
     SideBar,
@@ -96,8 +110,7 @@ export default {
       axios
         .get("http://127.0.0.1:8000/api/users")
         .then((response) => {
-          console.log(response.data); // Debugging statement
-          // if (Array.isArray(response.data.data)) {
+          console.log(response.data);
           this.users = response.data.data.map((user) => ({
             id: user.id,
             first_name: user.first_name,
@@ -106,55 +119,33 @@ export default {
             username: user.username,
             phone_number: user.phone_number,
           }));
-          // } else {
-          //   console.error("Invalid response data format:", response.data);
-          // }
         })
         .catch((error) => {
           console.error(error);
-          // Handle error gracefully, e.g., show error message to the user
         })
         .finally(() => {
           this.isLoading = false;
         });
     },
-
+    // for the add an users
     addUser() {
       this.$router.push("/addUser");
     },
-
-    deleteUser(ids) {
+    //for the multiple delete
+    deleteUser(id) {
       axios
-        .delete("http://127.0.0.1:8000/api/users/0", { ids: ids })
+        .delete("http://127.0.0.1:8000/api/users/delete/data", {
+          data: { ids: [id] },
+        })
         .then((response) => {
-          // Handle the successful response
-          console.log(response.data);
+          // Handle the success response
+          console.log(response.data); // You can do something with the response data here
         })
         .catch((error) => {
           // Handle the error
           console.error(error);
         });
     },
-    // deleteSelected_User() {
-    //   if (this.selected.length === 0) {
-    //     console.log("No rows selected for deletion");
-    //     return;
-    //   }
-
-    //   const selectedUserIds = this.selected.slice(); // Create a copy of selected user IDs
-
-    //   axios
-    //     .delete("http://127.0.0.1:8000/api/users", {
-    //       data: { ids: selectedUserIds },
-    //     })
-    //     .then(() => {
-    //       console.log("Successfully deleted selected users");
-    //       this.getData(); // Refresh the user data after deletion
-    //     })
-    //     .catch((error) => {
-    //       console.error(error);
-    //     });
-    // },
 
     editUserData(user) {
       this.$router.push({
@@ -169,13 +160,26 @@ export default {
         },
       });
     },
-
+    // for select or deselect by the main checkbox by main checkbox
     toggleAllCheckboxes() {
       if (this.selectAllRows) {
         this.selected = this.users.map((user) => user.id);
       } else {
         this.selected = [];
       }
+    },
+    setupSuccess_deleted() {
+      toast.success("SuccessFully deleted", {
+        autoClose: 2000,
+        position: "bottom-right",
+      });
+    },
+    // for facing a error
+    setuperror() {
+      toast.error("You face an error", {
+        autoClose: 2000,
+        position: "bottom-right",
+      });
     },
   },
 };
@@ -185,23 +189,44 @@ export default {
 #myTable {
   display: none;
 }
-.button {
-  width: 10%;
-  height: 10%;
-  margin-left: 100%;
-  margin-top: 1%;
-  margin-right: 0%;
+.container {
+  display: flex;
+  height: 100vh;
 }
 
-.table-container {
-  display: flex;
-  justify-content: center;
+.sidebar {
+  flex: 1;
+  background-color: #f1f1f1;
 }
-.table-container {
-  overflow-x: auto;
-  margin: 0 auto;
+.content {
+  flex: 9;
+  display: flex;
+  flex-direction: column;
+}
+.top-section {
+  flex: 1;
+  background-color: white;
+  margin-left: 74rem;
+  margin-top: 3rem;
+}
+.button-container {
+  display: flex;
+}
+
+.button-container button {
+  /* margin-right: 10px; */
+  min-width: 120px;
+  white-space: nowrap;
+}
+
+.bottom-section {
+  margin-left: 7.8rem;
+  flex: 9;
+  display: flex;
+  width: 100%;
 }
 .styled-table {
+  margin-left: 17rem;
   border-collapse: collapse;
   margin: 25px 0;
   left: 50%;
@@ -210,6 +235,7 @@ export default {
   font-family: sans-serif;
   min-width: 1000px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+  width: 100%;
 }
 .styled-table thead tr {
   background-color: #009879;
