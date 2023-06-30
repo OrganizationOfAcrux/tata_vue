@@ -1,42 +1,43 @@
 <template>
-  <div class="container1">
-    <form @submit.prevent="loginData">
-      <div class="form-group">
-        <div class="center">
-          <label for="password" class="emaillabel">Password:</label><br />
+  <base-card>
+    <div class="container1">
+      <form @submit.prevent="loginData">
+        <div class="form-group">
+          <div class="center">
+            <label for="password" class="emaillabel">Password:</label><br />
+          </div>
+          <input
+            class="form-control"
+            type="password"
+            name="password"
+            placeholder="*******"
+            id="Input"
+            required
+            v-model="data.password"
+          /><br /><br />
         </div>
-        <input
-          class="form-control"
-          type="password"
-          name="password"
-          placeholder="*******"
-          id="Input"
-          required
-          v-model="data.password"
-        /><br /><br />
-      </div>
-      <div class="form-group">
-        <label for="confirm_password" class="passwordlabel"
-          >Confirm - Password:</label
-        ><br />
-        <input
-          class="form-control"
-          type="password"
-          name="confirm_password"
-          placeholder="*********"
-          id="Input"
-          required
-          v-model="data.confirm_password"
-        />
-      </div>
-      <br />
-      <button class="btn btn-large btn-success" type="submit">
-        <font-awesome-icon icon="fa-solid fa-user" class="font1" /> LOGIN
-      </button>
-    </form>
-  </div>
+        <div class="form-group">
+          <label for="confirm_password" class="passwordlabel"
+            >Confirm - Password:</label
+          ><br />
+          <input
+            class="form-control"
+            type="password"
+            name="confirm_password"
+            placeholder="*********"
+            id="Input"
+            required
+            v-model="data.confirm_password"
+          />
+        </div>
+        <br />
+        <button class="btn btn-large btn-success" type="submit">
+          <font-awesome-icon icon="fa-solid fa-user" class="font1" /> Update
+        </button>
+      </form>
+    </div></base-card
+  >
 </template>
-
 <script>
 import axios from "axios";
 export default {
@@ -51,9 +52,8 @@ export default {
   methods: {
     loginData() {
       axios
-        .post("http://127.0.0.1:8000/api/forgotpassword", {
-          // .post("https://asdf-96315-default-rtdb.firebaseio.com/posts.json", {
-          email: this.data.email,
+        .post("http://127.0.0.1:8000/api/resetpassword", {
+          password: this.data.password,
           confirm_password: this.data.confirm_password,
           token: this.$route.params.token,
         })
@@ -87,6 +87,7 @@ form {
   justify-items: start;
   background-color: beige;
   width: 100% !important;
+  height: 100%;
   display: flex;
   align-items: center;
   width: fit-content;
@@ -101,9 +102,11 @@ form {
   font-size: 1rem;
 }
 .emaillabel {
-  font-size: 2rem;
+  font-size: 130%;
+  margin-right: 68%;
 }
 .passwordlabel {
-  font-size: 2rem;
+  font-size: 130%;
+  margin-right: 51%;
 }
 </style>

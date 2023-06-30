@@ -32,34 +32,32 @@
         <button class="btn btn-large btn-success" type="submit">
           <font-awesome-icon icon="fa-solid fa-user" class="font1" /> LOGIN
         </button>
-
         <br />
         <router-link to="/forget" class="nav-link" id="forgot"
           >Forgot Password?</router-link
         >
       </form>
     </div>
-
-    <!-- snackbar start -->
-    <div id="snackbar" :class="{ show: showsnackbar }">
-      <font-awesome-icon icon="fa-solid fa-at" /> Some text some message..
-    </div>
-
-    <button @click="snackbar" class="submit">hhhh</button>
-    <!-- ending of snackbar -->
   </base-card>
 </template>
 
 <script>
 import axios from "axios";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 export default {
+  setup() {
+    toast("Welcome To My Website", {
+      autoClose: 2000,
+    });
+  },
   data() {
     return {
       data: {
         password: "",
         email: "",
       },
-      showsnackbar: false,
+      responseMessage: "",
     };
   },
   methods: {
@@ -73,45 +71,56 @@ export default {
           if (response.status === 200) {
             // Assuming the API response includes an authentication token
             const authToken = response.data.token;
-
             // Save the authentication token in localStorage or Vuex store
             localStorage.setItem("authToken", authToken);
             // Store the data in vuex for use in hover
             this.$store.commit("setAPIResponse", response.data);
-            // Redirect to the home page
-            this.openPopup();
+            // for binding the response message with
+
+            this.responseMessage = response.data.msg;
             setTimeout(() => {
-              this.$router.push("/home");
+              if (this.responseMessage === "login successfull") {
+                //       // Check if there was no error
+                this.$router.push("/home");
+              }
             }, 3000);
-          } else {
-            // alert("Your email and password are incorrect.");
-            console.log("Login Successfully", response);
+            this.setupfor_SuccessLogin();
           }
         })
         .catch((error) => {
-          this.openPopup2();
-          setTimeout(() => {
-            // this.$router.push("/home");
-          }, 3000);
-          console.error("Login failed", error);
-        });
+          this.responseMessage = "An error occurred. Please try again."; // Set a generic error message
+          if (
+            error.response &&
+            error.response.data &&
+            error.response.data.msg
+          ) {
+            // If the error response contains a specific error message, use it
+            this.responseMessage = error.response.data.msg;
+          }
 
-      this.clearForm();
+          this.setupfor_error();
+        })
+        .finally(() => {
+          this.clearForm();
+        });
+    },
+    setupfor_SuccessLogin() {
+      toast.success("login SuccessFully", {
+        position: "bottom-right",
+
+        autoClose: 2000,
+      });
+    },
+    setupfor_error() {
+      toast.error("Something went wrong", {
+        position: "bottom-right",
+
+        autoClose: 2000,
+      });
     },
     clearForm() {
       this.data.email = "";
       this.data.password = "";
-    },
-
-    // for the snackbar opening
-    snackbar() {
-      this.showsnackbar = true;
-      setTimeout(this.closesnackbar, 3000);
-    },
-    // for the snackbar closeing
-
-    closesnackbar() {
-      this.showsnackbar = false;
     },
   },
 };
@@ -142,81 +151,15 @@ form {
   font-size: 1rem;
 }
 .emaillabel {
-  font-size: 2rem;
+  font-size: 130%;
+  margin-right: 74%;
 }
 .passwordlabel {
-  font-size: 2rem;
+  font-size: 130%;
+  margin-right: 68%;
 }
 #forgot {
   margin-top: 1%;
   margin-left: 26%;
-}
-
-/* snackbar style for the error */
-#snackbar {
-  visibility: hidden;
-  min-width: 250px;
-  margin-left: -125px;
-  /* background-color: ; */
-  color: #ff1010;
-  text-align: center;
-  border-radius: 2px;
-  padding: 16px;
-  position: fixed;
-  z-index: 1;
-  left: 50%;
-  bottom: 30px;
-  font-size: 17px;
-  margin-left: 31%;
-}
-
-#snackbar.show {
-  visibility: visible;
-  -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
-  animation: fadein 0.5s, fadeout 0.5s 2.5s;
-}
-
-@-webkit-keyframes fadein {
-  from {
-    bottom: 0;
-    opacity: 0;
-  }
-  to {
-    bottom: 30px;
-    opacity: 1;
-  }
-}
-
-@keyframes fadein {
-  from {
-    bottom: 0;
-    opacity: 0;
-  }
-  to {
-    bottom: 30px;
-    opacity: 1;
-  }
-}
-
-@-webkit-keyframes fadeout {
-  from {
-    bottom: 30px;
-    opacity: 1;
-  }
-  to {
-    bottom: 0;
-    opacity: 0;
-  }
-}
-
-@keyframes fadeout {
-  from {
-    bottom: 30px;
-    opacity: 1;
-  }
-  to {
-    bottom: 0;
-    opacity: 0;
-  }
 }
 </style>

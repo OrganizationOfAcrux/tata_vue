@@ -10,7 +10,7 @@
             class="btn btn-large btn-success"
             id="btn1"
             type="submit"
-            @click="addUser"
+            @click="addRole"
             style="
               font-size: 100%;
               margin-left: 100%;
@@ -18,7 +18,7 @@
             "
           >
             <font-awesome-icon icon="fa-solid fa-user-plus" class="font1" />
-            Add User
+            Add
           </button>
         </div>
       </div>
@@ -27,30 +27,23 @@
         <table border="2" class="styled-table">
           <thead>
             <tr>
-              <th>FirstName</th>
-              <th>LastName</th>
-              <th>User-Name</th>
-
-              <th>Email</th>
-              <th>Phone</th>
-              <th>Role</th>
+              <th>Name</th>
+              <th>Discription</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="user in users" :key="user.id">
-              <td>{{ user.first_name }}</td>
-              <td>{{ user.last_name }}</td>
-              <td>{{ user.username }}</td>
-
-              <td>{{ user.email }}</td>
-              <td>{{ user.phone_number }}</td>
-              <td>{{ user.role_name }}</td>
+              <td>{{ user.name }}</td>
+              <td>{{ user.discription }}</td>
               <td>
-                <button class="btn1" @click="editUserData(user)">
-                  <font-awesome-icon icon="fa-solid fa-edit" /></button
-                >&nbsp;&nbsp;
-                <button class="btn2" @click="deleteUsers(user.id)">
+                <button class="btn1" @click="copyRole(user.id)">
+                  <font-awesome-icon icon="fa-solid fa-copy" />
+                </button>
+                <button class="btn2" @click="editUserData(user)">
+                  <font-awesome-icon icon="fa-solid fa-edit" />
+                </button>
+                <button class="btn3" @click="deleteUsers(user.id)">
                   <font-awesome-icon icon="fa-solid fa-trash" />
                 </button>
               </td>
@@ -66,46 +59,48 @@ import axios from "axios";
 import SideBar from "../sidebar_File/sideBar.vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
-
 export default {
   components: {
     SideBar,
   },
   setup() {
-    toast.success("Welcome To User Data Table", {
+    toast.success("Welcome To Role Table", {
       position: "bottom-right",
+
       autoClose: 2000,
     });
   },
   data() {
     return {
       users: [],
-      selected: [],
     };
   },
-
   created() {
     this.getData();
   },
   methods: {
-    deleteUsers(id) {
-      const storedData = JSON.parse(localStorage.getItem("storeData"));
-
-      if (
-        storedData &&
-        storedData.apiResponse &&
-        storedData.apiResponse.data &&
-        storedData.apiResponse.data.id === id
-      ) {
-        // Display an error message or handle the error
-        toast.error("You cannot delete your own user account", {
-          position: "bottom-right",
-          autoClose: 3000,
-        });
-        return;
-      }
+    getData() {
       axios
-        .delete(`http://127.0.0.1:8000/api/users/${id}`)
+        .get("http://127.0.0.1:8000/api/roles")
+        .then((response) => {
+          console.log(response.data);
+          this.users = response.data.data.map((user) => ({
+            id: user.id,
+            name: user.name,
+            discription: user.discription,
+          }));
+        })
+        .catch((error) => {
+          console.error(error);
+        })
+        .finally(() => {
+          this.isLoading = false;
+        });
+    },
+    // for delete
+    deleteUsers(id) {
+      axios
+        .delete(`http://127.0.0.1:8000/api/roles/${id}`)
         .then((response) => {
           console.log(response);
           // Call the setupSuccess_deleted method to show a success message
@@ -114,54 +109,56 @@ export default {
         .catch((error) => {
           console.log(error);
           // Call the setupError method to show an error message
-          this.setupError();
+          this.setuperror();
         })
         .finally(() => {
           this.getData();
         });
     },
-    getData() {
+    // for copy
+    copyRole(id) {
       axios
-        .get("http://127.0.0.1:8000/api/users")
+        .get(`http://127.0.0.1:8000/api/roles/${id}/edit`)
         .then((response) => {
-          console.log(response.data);
-          this.users = response.data.data.map((user) => ({
-            id: user.id,
-            first_name: user.first_name,
-            last_name: user.last_name,
-            email: user.email,
-            username: user.username,
-            phone_number: user.phone_number,
-            role_name: user.role_name,
-            role_id: user.role_id,
-          }));
+          console.log(response);
+          const copiedUser = this.users.find((user) => user.id === id);
+          const index = this.users.findIndex((user) => user.id === id);
+          if (index !== -1) {
+            this.users.splice(index + 1, 0, { ...copiedUser });
+          }
+          this.setupSuccess_copied();
         })
         .catch((error) => {
-          console.error(error);
+          console.log(error);
+          this.setuperror();
+        })
+        .finally(() => {
+          this.getData();
         });
     },
-    // for the add an users
-    addUser() {
-      this.$router.push("/addUser");
+    addRole() {
+      this.$router.push("/addrole");
     },
-    //for the multiple delete
+    //for the edit role
     editUserData(user) {
       this.$router.push({
-        path: "/addUser",
+        path: "/addrole",
         query: {
           id: user.id,
-          first_name: user.first_name,
-          last_name: user.last_name,
-          email: user.email,
-          username: user.username,
-          phone_number: user.phone_number,
-          role_name: user.role_name,
-          role_id: user.role_id,
+          name: user.name,
+          discription: user.discription,
         },
       });
     },
     setupSuccess_deleted() {
       toast.success("SuccessFully deleted", {
+        autoClose: 2000,
+        position: "bottom-right",
+      });
+    },
+    // for copied alert
+    setupSuccess_copied() {
+      toast.success("Successfully copied", {
         autoClose: 2000,
         position: "bottom-right",
       });
@@ -225,10 +222,11 @@ export default {
   padding: 50%;
   font-size: 0.9em;
   font-family: sans-serif;
+  font-style: italic;
+
   min-width: 1000px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
   width: 100%;
-  font-style: italic;
 }
 .styled-table thead tr {
   background-color: #009879;
@@ -255,17 +253,27 @@ export default {
   font-weight: bold;
   color: #009879;
 }
-.btn1 {
+.btn2 {
   color: #009879;
   border: transparent;
   background-color: transparent;
   font-size: 144%;
+  margin-left: 3rem;
+  /* margin-right: -3rem; */
 }
-.btn2 {
+.btn1 {
+  color: yellow;
+  border: transparent;
+  background-color: transparent;
+  font-size: 144%;
+  /* margin-left: 1rem; */
+  /* margin-right: -3rem; */
+}
+.btn3 {
   color: red;
   border: transparent;
   background-color: transparent;
   font-size: 144%;
-  margin-left: 15%;
+  margin-left: 10%;
 }
 </style>

@@ -8,6 +8,8 @@ import loginfile from '../components/loginFile.vue'
 import adduser from '../components/addUser.vue'
 import forgetPassword from '../password_File/forgetPassword.vue'
 import resetPassword from '../password_File/resetPassword.vue'
+import roleTable from '../role/roleDataTable.vue'
+import addRole from '../role/addRole.vue'
 
 const abhi = {
     isAuthenticated() {
@@ -37,7 +39,9 @@ const router = createRouter({
             meta: { requiresAuth: true }
         },
         { path: '/forget', component: forgetPassword },
-        { path: '/reset/:token', component: resetPassword }
+        { path: '/reset/:token', component: resetPassword },
+        { path: '/roletable', component: roleTable },
+        { path: '/addrole', component: addRole }
     ]
 })
 
@@ -45,19 +49,6 @@ router.beforeEach((to, from, next) => {
     if (to.meta.requiresAuth && !abhi.isAuthenticated()) {
         // If the route requires authentication and the user is not authenticated, redirect to the login page
         next('/login')
-
-        // do work on this after some time
-        // } else if (to.path === '/login' && abhi.isAuthenticated()) {
-        //     // If the user is already authenticated and tries to access the login page, redirect to the home page
-        //     next('/home')
-        //     if (confirm('If, You do this process, your Account is Logout. Do you want to proceed?')) {
-        //         localStorage.clear();
-        //         // Perform additional actions after clearing localStorage, if needed.
-        //     } else {
-        //         // Handle the cancel button action, if needed.
-        //     }
-
-        // alert('First Logout, Then go to login ')
     } else {
         // Otherwise, proceed with navigation
         next()

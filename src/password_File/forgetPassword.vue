@@ -16,7 +16,6 @@
             v-model="data.email"
           /><br /><br />
         </div>
-
         <br />
         <button class="btn btn-large btn-success" type="submit">
           <font-awesome-icon icon="fa-solid fa-user" class="font1" /> Reset
@@ -26,7 +25,6 @@
     </div></base-card
   >
 </template>
-
 <script>
 import axios from "axios";
 export default {
@@ -40,20 +38,17 @@ export default {
   methods: {
     forget_Password() {
       axios
-        .post("http://127.0.0.1:8000/api/forgotpassword", {
-          // .post("https://asdf-96315-default-rtdb.firebaseio.com/posts.json", {
+        .post("http://127.0.0.1:8000/api/forgetpassword", {
           email: this.data.email,
         })
         .then((response) => {
-          this.$router.push("/reset/:token");
-          // this.$router.push("/reset");
-          console.log(response);
+          console.log("hrlloi");
+          const token = response.data.data.token;
+          this.$router.push(`/reset/${token}`);
         })
         .catch((error) => {
           console.error("Email Wrong", error);
         });
-      // alert("Your Email  Successfully Submit, Set Your Password");
-
       this.clearForm();
     },
     clearForm() {
@@ -88,26 +83,7 @@ form {
   font-size: 1rem;
 }
 .emaillabel {
-  font-size: 2rem;
-}
-.passwordlabel {
-  font-size: 2rem;
+  font-size: 130%;
+  margin-right: 74%;
 }
 </style>
-
-<!-- deleteSelected_User() { 
-this.selected.forEach((userId) => { axios
-.delete(`http://127.0.0.1:8000/api/users/${userId}`) .then(() => {
-console.log(`Successfully deleted user with ID: ${userId}`); this.getData(); //
-Refresh the user data after deletion }) .catch((error) => {
-console.error(error); }); }); if (this.selected.length === 0) { console.log("No
-rows selected for deletion"); return; } },
-
-<button
-  class="btn btn-large btn-success"
-  type="submit"
-  @click="deleteSelected_User"
->
-            <font-awesome-icon icon="fa-solid fa-user-minus" class="font1" />
-            DeleteSeletected_User
-          </button> -->

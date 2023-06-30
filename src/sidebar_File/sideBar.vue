@@ -4,7 +4,7 @@
       <img
         alt="Vue logo"
         src="../assets/logotata.png"
-        class="font"
+        class="font colored-image"
         style="
           top: 0;
           width: 80px;
@@ -18,32 +18,43 @@
       />
     </div>
     <div class="mid">
-      <button class="btn" type="submit" @click="button">
-        <font-awesome-icon icon="fa-solid " class="nav-link" />Users
+      <button
+        class="btn"
+        type="submit"
+        @click="button"
+        :class="{ green: isUserDataPage }"
+      >
+        <font-awesome-icon icon="fa-solid " class="nav-link" />Users</button
+      ><br /><br /><button
+        class="btn"
+        type="submit"
+        @click="button2"
+        :class="{ green1: isRolePage }"
+      >
+        <font-awesome-icon icon="fa-solid " class="nav-link" />Role
       </button>
     </div>
     <div class="mid2"></div>
-    <!-- <a class="side-link" id="sidebar-link" href="#">button1</a>
-    <a class="side-link" id="sidebar-link" href="#">button2</a> -->
-    <!-- side-link active -->
-
     <div class="fot">
-      <!-- <button
-        class="btn btn-large btn-success w-100 h-100"
-        type="submit"
-        @click="button"
-      > -->
       <div id="tooltip">
         <span id="tooltipText"
-          ><div v-if="selectedData">
+          ><div v-if="selectedData" style="margin: 3%">
             Email: {{ selectedData.email }}<br />
             Username: {{ selectedData.username }}<br />
-            <button @click="logout_User">LogOut</button>
-            <!-- {{ apiResponse }} -->
+            <button @click="logout_User" style="background-color: red">
+              LogOut
+            </button>
           </div></span
         >
         <span
-          ><button style="background-color: aqua; height: 50px; width: 60px">
+          ><button
+            style="
+              background-color: #009879;
+              height: 50px;
+              min-width: 100%;
+              border-color: transparent;
+            "
+          >
             <font-awesome-icon
               icon="fa-solid fa-user"
               id="font1"
@@ -51,14 +62,14 @@
             /></button
         ></span>
       </div>
-      <!-- </button> -->
     </div>
   </div>
 </template>
-
 <script>
 import axios from "axios";
 import { mapState } from "vuex";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 export default {
   data() {
     return {
@@ -66,13 +77,44 @@ export default {
         password: "",
         email: "",
       },
+      isUserDataPage: false,
+      isRolePage: false,
     };
   },
+
+  created() {
+    if (this.$route.path === "/userData") {
+      this.isUserDataPage = true;
+      this.isRolePage = false;
+    } else if (this.$route.path === "/addUser") {
+      this.isUserDataPage = true;
+      this.isRolePage = false;
+    } else if (this.$route.path === "/home") {
+      this.isUserDataPage = false;
+      this.isRolePage = false;
+    } else if (this.$route.path === "/roletable") {
+      this.isUserDataPage = false;
+      this.isRolePage = true;
+    } else if (this.$route.path === "/addrole") {
+      this.isUserDataPage = false;
+      this.isRolePage = true;
+    } else {
+      this.isUserDataPage = false;
+      this.isRolePage = false;
+    }
+  },
+  // this is for the take data from  api response and display
   computed: {
     ...mapState(["apiResponse"]),
+
     selectedData() {
-      if (this.apiResponse) {
-        const { email, username } = this.apiResponse;
+      let storedData = JSON.parse(localStorage.getItem("storeData"));
+
+      if (storedData && storedData.apiResponse && storedData.apiResponse.data) {
+        const { email, username } = storedData.apiResponse.data;
+        return { email, username };
+      } else if (this.apiResponse && this.apiResponse.data) {
+        const { email, username } = this.apiResponse.data;
         return { email, username };
       } else {
         return null;
@@ -83,33 +125,62 @@ export default {
     handleImageClick() {
       this.$router.push("/home");
     },
-
+    // for the users table
     button() {
       this.$router.push("/userData");
       console.log("define your table");
     },
+    // for the role table
+    button2() {
+      this.$router.push("/roletable");
+      this.isRolePage = true;
+    },
     logout_User() {
       axios
-        .post("http://127.0.0.1:8000/api/logout", {
-          email: "",
-          password: "",
-          // console.log("logout");
-          // this.$router.push("/login");
-        })
-        .then((Response) => {
-          console.log(Response);
+        .get("http://127.0.0.1:8000/api/logout")
+        .then(() => {
           localStorage.clear();
-          console.log("SuccessFully Logout");
-          this.$router.push("/login");
+          this.setupSuccess_logout();
+          setTimeout(() => {
+            this.$router.push("/login"); // Redirect to the login page
+          }, 3000);
         })
-        .catch((error) => {
-          console.log(error, "You Face A error");
+        .catch(() => {
+          this.setuperror();
         });
+    },
+    // for success logout
+    setupSuccess_logout() {
+      toast.success("SuccessFully Logout", {
+        autoClose: 2000,
+        position: "bottom-right",
+      });
+    },
+    // for facing a error
+    setuperror() {
+      toast.error("You Face A error", {
+        autoClose: 2000,
+        position: "bottom-right",
+      });
     },
   },
 };
 </script>
 <style scoped>
+.colored-image {
+  filter: brightness(0%) saturate(98%) invert(28%) sepia(23%) saturate(5177%)
+    hue-rotate(139deg) brightness(91%) contrast(100%);
+}
+.green {
+  background-color: #009879;
+  font-size: 100%;
+  min-width: 100%;
+}
+.green1 {
+  background-color: #009879;
+  font-size: 100%;
+  min-width: 100%;
+}
 .head {
   height: 15%;
 }
@@ -123,17 +194,15 @@ export default {
   height: 5%;
   bottom: 0;
   left: 0;
-
   margin-top: 50px;
-  margin-left: 20px;
 }
 .sidebar {
-  position: fixed; /* Added */
-  top: 0; /* Added */
-  left: 0; /* Added */
-  height: 100%; /* Added */
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
   display: flex;
-  flex-direction: column; /* Changed */
+  flex-direction: column;
   background-color: rgb(215, 212, 212);
   padding: 1rem;
 }
@@ -146,15 +215,16 @@ export default {
 }
 #tooltipText {
   position: absolute;
-  transform: translateX(-50%);
-  background-color: white;
+  transform: translateX(-45%);
+  background-color: rgb(223, 220, 220);
   color: black;
   padding: 10px, 15px;
-  border-radius: 7px;
+  border-radius: 10px;
   visibility: hidden;
   opacity: 0;
   transition: opacity 0.5s ease;
-  margin-left: 70%;
+  margin-left: 180%;
+  width: 300px;
 }
 #tooltipText::before {
   content: "";
@@ -162,43 +232,8 @@ export default {
   transform: translateX(-50%);
 }
 #tooltip:hover #tooltipText {
-  top: -130%;
+  top: -185%;
   visibility: visible;
   opacity: 1;
 }
 </style>
-
-<!-- <style>
-
-.nav-link,
-.side-link {
-  display: block;
-  /* margin-block: 0.5rem; */
-  /* width: 100%; */
-  /* text-decoration: none; */
-  /* color: inherit; */
-  border: none;
-  background: none;
-  padding: 0;
-  cursor: pointer;
-}
-/* #sidebar-button {
-  display: block;
-  margin-block: 0.5rem;
-  width: 100%;
-} */
-.font {
-  color: rgba(106, 153, 228, 0.877);
-}
-.font1 {
-  font-size: 2rem;
-  color: rgb(247, 21, 9);
-  margin-top: 34rem;
-}
-.img1 {
-  top: 0;
-  width: 4rem;
-  height: 4rem;
-  margin-left: 20rem;
-}
-</style> -->
