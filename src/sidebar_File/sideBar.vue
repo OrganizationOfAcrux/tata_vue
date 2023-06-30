@@ -81,7 +81,7 @@ export default {
       isRolePage: false,
     };
   },
-
+  // for the button colour
   created() {
     if (this.$route.path === "/userData") {
       this.isUserDataPage = true;
@@ -103,7 +103,7 @@ export default {
       this.isRolePage = false;
     }
   },
-  // this is for the take data from  api response and display
+  // this is for the take data from  api response and display in the hover property
   computed: {
     ...mapState(["apiResponse"]),
 
@@ -142,7 +142,7 @@ export default {
           localStorage.clear();
           this.setupSuccess_logout();
           setTimeout(() => {
-            this.$router.push("/login"); // Redirect to the login page
+            this.$router.push("/login");
           }, 3000);
         })
         .catch(() => {

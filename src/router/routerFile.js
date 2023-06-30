@@ -1,7 +1,4 @@
-
-
 import { createRouter, createWebHistory } from 'vue-router'
-
 import homeFile from '../components/homeFile.vue'
 import userDataTable from '../components/userDataTable.vue'
 import loginfile from '../components/loginFile.vue'
@@ -15,7 +12,7 @@ const abhi = {
     isAuthenticated() {
         // Check if the authentication token is present
         const authToken = localStorage.getItem("authToken");
-        return !!authToken; // Return true if authToken is not null or undefined
+        return !!authToken;
     }
 }
 

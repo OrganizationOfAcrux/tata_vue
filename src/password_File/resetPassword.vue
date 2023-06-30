@@ -1,7 +1,7 @@
 <template>
   <base-card>
     <div class="container1">
-      <form @submit.prevent="loginData">
+      <form @submit.prevent="updateData">
         <div class="form-group">
           <div class="center">
             <label for="password" class="emaillabel">Password:</label><br />
@@ -40,6 +40,8 @@
 </template>
 <script>
 import axios from "axios";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 export default {
   data() {
     return {
@@ -50,23 +52,27 @@ export default {
     };
   },
   methods: {
-    loginData() {
+    updateData() {
       axios
         .post("http://127.0.0.1:8000/api/resetpassword", {
           password: this.data.password,
           confirm_password: this.data.confirm_password,
           token: this.$route.params.token,
         })
-        .then((response) => {
-          if (response.status === 200) {
+        .then(() => {
+          toast.success("Your Password Updated", {
+            autoClose: 1000,
+            position: "bottom-right",
+          });
+          setTimeout(() => {
             this.$router.push("/login");
-            console.log(response);
-          } else {
-            alert("Your password and confirm_Password does not match");
-          }
+          }, 2000);
         })
-        .catch((error) => {
-          console.error("Login failed", error);
+        .catch(() => {
+          toast.error("Your password and confirm_Password does not match", {
+            autoClose: 2000,
+            position: "bottom-right",
+          });
         });
       this.clearForm();
     },

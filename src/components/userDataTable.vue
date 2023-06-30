@@ -22,7 +22,6 @@
           </button>
         </div>
       </div>
-      <!-- <div class="table-container"> -->
       <div class="bottom-section">
         <table border="2" class="styled-table">
           <thead>
@@ -30,7 +29,6 @@
               <th>FirstName</th>
               <th>LastName</th>
               <th>User-Name</th>
-
               <th>Email</th>
               <th>Phone</th>
               <th>Role</th>
@@ -42,7 +40,6 @@
               <td>{{ user.first_name }}</td>
               <td>{{ user.last_name }}</td>
               <td>{{ user.username }}</td>
-
               <td>{{ user.email }}</td>
               <td>{{ user.phone_number }}</td>
               <td>{{ user.role_name }}</td>
@@ -66,7 +63,6 @@ import axios from "axios";
 import SideBar from "../sidebar_File/sideBar.vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
-
 export default {
   components: {
     SideBar,
@@ -83,14 +79,13 @@ export default {
       selected: [],
     };
   },
-
   created() {
     this.getData();
   },
   methods: {
     deleteUsers(id) {
+      // this validation for the login account not deleted
       const storedData = JSON.parse(localStorage.getItem("storeData"));
-
       if (
         storedData &&
         storedData.apiResponse &&
@@ -106,15 +101,11 @@ export default {
       }
       axios
         .delete(`http://127.0.0.1:8000/api/users/${id}`)
-        .then((response) => {
-          console.log(response);
-          // Call the setupSuccess_deleted method to show a success message
+        .then(() => {
           this.setupSuccess_deleted();
         })
-        .catch((error) => {
-          console.log(error);
-          // Call the setupError method to show an error message
-          this.setupError();
+        .catch(() => {
+          this.setuperror();
         })
         .finally(() => {
           this.getData();
@@ -144,7 +135,6 @@ export default {
     addUser() {
       this.$router.push("/addUser");
     },
-    //for the multiple delete
     editUserData(user) {
       this.$router.push({
         path: "/addUser",
@@ -160,6 +150,7 @@ export default {
         },
       });
     },
+    // for the success deleted
     setupSuccess_deleted() {
       toast.success("SuccessFully deleted", {
         autoClose: 2000,
@@ -206,7 +197,6 @@ export default {
 }
 
 .button-container button {
-  /* margin-right: 10px; */
   min-width: 120px;
   white-space: nowrap;
 }

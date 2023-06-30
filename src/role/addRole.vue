@@ -18,13 +18,13 @@
           /><br /><br />
         </div>
         <div class="form-group">
-          <label for="password" class="passwordlabel">Discription:</label><br />
+          <label for="password" class="passwordlabel">description:</label><br />
           <textarea
-            name="discription"
+            name="description"
             id=""
             cols="63"
             rows="3"
-            v-model="data.discription"
+            v-model="data.description"
           ></textarea>
         </div>
         <br />
@@ -55,7 +55,7 @@ export default {
     return {
       data: {
         name: "",
-        discription: "",
+        description: "",
       },
       editingId: "",
     };
@@ -64,7 +64,7 @@ export default {
     if (this.$route.query.id) {
       this.editingId = this.$route.query.id;
       this.data.name = this.$route.query.name || "";
-      this.data.discription = this.$route.query.discription || "";
+      this.data.description = this.$route.query.description || "";
       this.isEditing = true;
     }
   },
@@ -74,7 +74,7 @@ export default {
         axios
           .put(`http://127.0.0.1:8000/api/roles/${this.editingId}`, {
             name: this.data.name,
-            discription: this.data.discription,
+            description: this.data.description,
           })
           .then(() => {
             this.setupSuccess_update();
@@ -83,31 +83,31 @@ export default {
 
               this.$router.push("/roletable");
             }, 3000);
+          })
+          .catch((error) => {
+            console.log(error);
           });
       } else {
         axios
           .post("http://127.0.0.1:8000/api/roles", {
             name: this.data.name,
-            discription: this.data.discription,
+            description: this.data.description,
           })
           .then(() => {
             this.setupSuccess_added();
             setTimeout(() => {
               this.clearForm();
-
               this.$router.push("/roletable");
             }, 3000);
           })
-          .catch((Response) => {
-            console.log(Response);
-          });
+          .catch(() => {});
         this.clearForm();
       }
     },
+    //fpr success login
     setupfor_SuccessLogin() {
       toast.success("login SuccessFully", {
         position: "bottom-right",
-
         autoClose: 2000,
       });
     },
@@ -119,16 +119,19 @@ export default {
         autoClose: 2000,
       });
     },
+    // for clear the form
     clearForm() {
       this.data.email = "";
       this.data.password = "";
     },
+    // for success update
     setupSuccess_update() {
       toast.success("SuccessFully Updated", {
         autoClose: 2000,
         position: "bottom-right",
       });
     },
+    // for success added
     setupSuccess_added() {
       toast.success("SuccessFully, You Added A Member  ", {
         autoClose: 2000,

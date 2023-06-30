@@ -49,6 +49,7 @@ export default {
   setup() {
     toast("Welcome To My Website", {
       autoClose: 2000,
+      position: "bottom-right",
     });
   },
   data() {
@@ -71,39 +72,28 @@ export default {
           if (response.status === 200) {
             // Assuming the API response includes an authentication token
             const authToken = response.data.token;
-            // Save the authentication token in localStorage or Vuex store
+            // Save the authentication token in localStorage
             localStorage.setItem("authToken", authToken);
             // Store the data in vuex for use in hover
             this.$store.commit("setAPIResponse", response.data);
             // for binding the response message with
-
             this.responseMessage = response.data.msg;
             setTimeout(() => {
               if (this.responseMessage === "login successfull") {
-                //       // Check if there was no error
                 this.$router.push("/home");
               }
             }, 3000);
             this.setupfor_SuccessLogin();
           }
         })
-        .catch((error) => {
-          this.responseMessage = "An error occurred. Please try again."; // Set a generic error message
-          if (
-            error.response &&
-            error.response.data &&
-            error.response.data.msg
-          ) {
-            // If the error response contains a specific error message, use it
-            this.responseMessage = error.response.data.msg;
-          }
-
+        .catch(() => {
           this.setupfor_error();
         })
         .finally(() => {
           this.clearForm();
         });
     },
+    // for the success toast
     setupfor_SuccessLogin() {
       toast.success("login SuccessFully", {
         position: "bottom-right",
@@ -111,6 +101,7 @@ export default {
         autoClose: 2000,
       });
     },
+    // for the error toast
     setupfor_error() {
       toast.error("Something went wrong", {
         position: "bottom-right",
@@ -118,6 +109,7 @@ export default {
         autoClose: 2000,
       });
     },
+    // for the clear form
     clearForm() {
       this.data.email = "";
       this.data.password = "";

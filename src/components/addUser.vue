@@ -58,7 +58,7 @@
           <label for="phone" class="phonelabel">Phone No.:</label><br />
           <input
             class="form-control"
-            type="number"
+            type="tel"
             name="phone"
             placeholder="9876543210"
             id="Input"
@@ -92,39 +92,11 @@
             required
             v-model="data.role_id"
           >
-            <option value="" disabled selected>Select a role</option>
-            <option v-for="role in roles" :key="role.id" :value="role.id">
-              {{ role.name }}
+            <option v-for="(name, id) in roles" :key="id" :value="id">
+              {{ name }}
             </option>
           </select>
         </div>
-        <!-- FOR THE IMAGE -->
-        <!-- <div class="form-group">
-          <label for="phone" class="imagelabel">Image:</label><br />
-
-          <div class="form-group col-md-3">
-            <div class="image-upload">
-              <label for="image-input">
-                <div class="circular-input">
-                  <input
-                    type="file"
-                    id="image-input"
-                    @change="handleFileUpload"
-                    name="image"
-                  />
-                  <div class="pencil-icon" @click="handleFileUpload">
-                    <i class="fas fa-pencil-alt"></i>
-                  </div>
-                </div>
-              </label>
-            </div>
-          </div>
-          <div @click="onUpload"><button>button</button></div>
-          <div class="form-group col-md-4">
-            <img :src="imagePreview" alt="Image Preview" class="imagepreview" />
-          </div>
-        </div> -->
-
         <br />
         <button class="btn btn-success" type="submit">
           {{ editingId ? "UPDATE" : "Add" }}
@@ -163,7 +135,6 @@ export default {
         roles: [],
         editingId: "",
         isHide: true,
-        // imagePreview: null,
       };
     }
   },
@@ -183,6 +154,7 @@ export default {
     this.getData();
   },
   methods: {
+    // for the store or update the data
     storeData() {
       if (this.editingId) {
         axios
@@ -231,36 +203,13 @@ export default {
       axios
         .get("http://127.0.0.1:8000/api/roles-list")
         .then((response) => {
-          console.log("fhsdufnjikfgl");
-          console.log(response.data);
-          this.roles = response.data.data.map((role) => ({
-            id: role.id,
-            name: role.name,
-          }));
+          this.roles = response.data.data;
         })
         .catch((error) => {
           console.error(error);
         });
     },
-    // FOR THE IMAGE
-    // handleFileUpload(event) {
-    // const file = event.target.files[0];
-    // this.imagePreview = event.target.files[0];
-    // this.imagePreview = URL.createObjectURL(file);
-    // },
-    //this function for upload to call on a button
-    // onUpload() {
-    //   const fd = new FormData();
-    //   fd.append("image", this.imagePreview);
-    //   axios
-    //     .post("https://asdf-96315-default-rtdb.firebaseio.com/", fd)
-    //     .then((response) => {
-    //       console.log(response);
-    //     })
-    //     .catch((error) => {
-    //       console.log(error);
-    //     });
-    // },
+    // for the clear form
     clearForm() {
       (this.data.first_name = ""),
         (this.data.last_name = ""),
@@ -269,6 +218,7 @@ export default {
         (this.data.username = ""),
         (this.data.phone_number = "");
     },
+    // for the success update
     setupSuccess_update() {
       toast.success("SuccessFully Updated", {
         autoClose: 2000,
@@ -347,41 +297,4 @@ form {
   height: 100px;
   object-fit: cover;
 }
-/* for image */
-/* .circular-input {
-  position: relative;
-  display: inline-block;
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  border: 2px dashed #ccc;
-  background-color: #f9f9f9;
-  cursor: pointer;
-}
-
-.circular-input i {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 24px;
-  color: #555;
-}
-
-.circular-input input[type="file"] {
-  opacity: 0;
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  cursor: pointer;
-}
-
-.imagepreview {
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
-  border-radius: 50%;
-} */
 </style>

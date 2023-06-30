@@ -27,6 +27,8 @@
 </template>
 <script>
 import axios from "axios";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 export default {
   data() {
     return {
@@ -42,12 +44,14 @@ export default {
           email: this.data.email,
         })
         .then((response) => {
-          console.log("hrlloi");
           const token = response.data.data.token;
           this.$router.push(`/reset/${token}`);
         })
-        .catch((error) => {
-          console.error("Email Wrong", error);
+        .catch(() => {
+          toast.error("Your email is not matched!", {
+            autoClose: 2000,
+            position: "bottom-right",
+          });
         });
       this.clearForm();
     },

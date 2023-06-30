@@ -22,20 +22,19 @@
           </button>
         </div>
       </div>
-      <!-- <div class="table-container"> -->
       <div class="bottom-section">
         <table border="2" class="styled-table">
           <thead>
             <tr>
               <th>Name</th>
-              <th>Discription</th>
+              <th>description</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="user in users" :key="user.id">
               <td>{{ user.name }}</td>
-              <td>{{ user.discription }}</td>
+              <td>{{ user.description }}</td>
               <td>
                 <button class="btn1" @click="copyRole(user.id)">
                   <font-awesome-icon icon="fa-solid fa-copy" />
@@ -66,7 +65,6 @@ export default {
   setup() {
     toast.success("Welcome To Role Table", {
       position: "bottom-right",
-
       autoClose: 2000,
     });
   },
@@ -83,15 +81,16 @@ export default {
       axios
         .get("http://127.0.0.1:8000/api/roles")
         .then((response) => {
-          console.log(response.data);
+          console.log(response.data.data);
           this.users = response.data.data.map((user) => ({
             id: user.id,
             name: user.name,
-            discription: user.discription,
+            description: user.description,
           }));
         })
         .catch((error) => {
           console.error(error);
+          this.setupError();
         })
         .finally(() => {
           this.isLoading = false;
@@ -101,15 +100,11 @@ export default {
     deleteUsers(id) {
       axios
         .delete(`http://127.0.0.1:8000/api/roles/${id}`)
-        .then((response) => {
-          console.log(response);
-          // Call the setupSuccess_deleted method to show a success message
+        .then(() => {
           this.setupSuccess_deleted();
         })
-        .catch((error) => {
-          console.log(error);
-          // Call the setupError method to show an error message
-          this.setuperror();
+        .catch(() => {
+          this.setupErrordelete();
         })
         .finally(() => {
           this.getData();
@@ -128,14 +123,14 @@ export default {
           }
           this.setupSuccess_copied();
         })
-        .catch((error) => {
-          console.log(error);
-          this.setuperror();
+        .catch(() => {
+          this.setupError();
         })
         .finally(() => {
           this.getData();
         });
     },
+    // for the after add the role push  to next page
     addRole() {
       this.$router.push("/addrole");
     },
@@ -146,26 +141,34 @@ export default {
         query: {
           id: user.id,
           name: user.name,
-          discription: user.discription,
+          description: user.description,
         },
       });
     },
+    // for success deleted
     setupSuccess_deleted() {
-      toast.success("SuccessFully deleted", {
+      toast.success("Role deleted successfully.", {
         autoClose: 2000,
         position: "bottom-right",
       });
     },
-    // for copied alert
+    // for success copied
     setupSuccess_copied() {
-      toast.success("Successfully copied", {
+      toast.success("Role copied successfully", {
         autoClose: 2000,
         position: "bottom-right",
       });
     },
-    // for facing a error
-    setuperror() {
-      toast.error("You face an error", {
+    // for the error
+    setupError() {
+      toast.error("Something went wrong", {
+        autoClose: 2000,
+        position: "bottom-right",
+      });
+    },
+    // for the delete
+    setupErrordelete() {
+      toast.error("Cannot delete the role. It is in use by some users.", {
         autoClose: 2000,
         position: "bottom-right",
       });
@@ -266,8 +269,6 @@ export default {
   border: transparent;
   background-color: transparent;
   font-size: 144%;
-  /* margin-left: 1rem; */
-  /* margin-right: -3rem; */
 }
 .btn3 {
   color: red;
