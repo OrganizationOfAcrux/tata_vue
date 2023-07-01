@@ -42,7 +42,6 @@
 </template>
 
 <script>
-import axios from "axios";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 export default {
@@ -63,28 +62,18 @@ export default {
   },
   methods: {
     loginData() {
-      axios
+      this.$axios
         .post("http://127.0.0.1:8000/api/login", {
           email: this.data.email,
           password: this.data.password,
         })
         .then((response) => {
-          if (response.status === 200) {
-            // Assuming the API response includes an authentication token
-            const authToken = response.data.token;
-            // Save the authentication token in localStorage
-            localStorage.setItem("authToken", authToken);
-            // Store the data in vuex for use in hover
-            this.$store.commit("setAPIResponse", response.data);
-            // for binding the response message with
-            this.responseMessage = response.data.msg;
-            setTimeout(() => {
-              if (this.responseMessage === "login successfull") {
-                this.$router.push("/home");
-              }
-            }, 3000);
-            this.setupfor_SuccessLogin();
-          }
+          const state = response.data.data;
+          localStorage.setItem("storeData", JSON.stringify(state));
+          setTimeout(() => {
+            this.$router.push("/home");
+          }, 3000);
+          this.setupfor_SuccessLogin();
         })
         .catch(() => {
           this.setupfor_error();

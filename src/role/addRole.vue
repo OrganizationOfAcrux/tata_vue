@@ -37,14 +37,9 @@
   </base-card>
 </template>
 <script>
-import axios from "axios";
 import { toast } from "vue3-toastify";
-import SideBar from "../sidebar_File/sideBar.vue";
 import "vue3-toastify/dist/index.css";
 export default {
-  components: {
-    SideBar,
-  },
   setup() {
     toast.success("Welcome To Add Role Page", {
       autoClose: 2000,
@@ -71,7 +66,7 @@ export default {
   methods: {
     addRole() {
       if (this.editingId) {
-        axios
+        this.$axios
           .put(`http://127.0.0.1:8000/api/roles/${this.editingId}`, {
             name: this.data.name,
             description: this.data.description,
@@ -88,7 +83,7 @@ export default {
             console.log(error);
           });
       } else {
-        axios
+        this.$axios
           .post("http://127.0.0.1:8000/api/roles", {
             name: this.data.name,
             description: this.data.description,

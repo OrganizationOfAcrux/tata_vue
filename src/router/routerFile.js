@@ -8,21 +8,13 @@ import resetPassword from '../password_File/resetPassword.vue'
 import roleTable from '../role/roleDataTable.vue'
 import addRole from '../role/addRole.vue'
 
-const abhi = {
-    isAuthenticated() {
-        // Check if the authentication token is present
-        const authToken = localStorage.getItem("authToken");
-        return !!authToken;
-    }
-}
-
 const router = createRouter({
     history: createWebHistory(),
     routes: [
         {
             path: '/home',
             component: homeFile,
-            meta: { requiresAuth: true } // Add meta field for requiring authentication
+            meta: { requiresAuth: true }
         },
         {
             path: '/userData',
@@ -35,21 +27,31 @@ const router = createRouter({
             path: '/addUser', component: adduser,
             meta: { requiresAuth: true }
         },
-        { path: '/forget', component: forgetPassword },
-        { path: '/reset/:token', component: resetPassword },
-        { path: '/roletable', component: roleTable },
-        { path: '/addrole', component: addRole }
+        {
+            path: '/forget', component: forgetPassword
+        },
+        {
+            path: '/reset/:token', component: resetPassword
+        },
+        {
+            path: '/roletable', component: roleTable,
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/addrole', component: addRole,
+            meta: { requiresAuth: true }
+        }
     ]
 })
 
 router.beforeEach((to, from, next) => {
-    if (to.meta.requiresAuth && !abhi.isAuthenticated()) {
-        // If the route requires authentication and the user is not authenticated, redirect to the login page
-        next('/login')
-    } else {
-        // Otherwise, proceed with navigation
-        next()
-    }
-})
+    const isLoggedIn = !!localStorage.getItem("storeData");
+    const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
 
+    if (requiresAuth && !isLoggedIn) {
+        next({ name: "login" });
+    } else {
+        next();
+    }
+});
 export default router

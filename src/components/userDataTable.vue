@@ -59,14 +59,9 @@
   </div>
 </template>
 <script>
-import axios from "axios";
-import SideBar from "../sidebar_File/sideBar.vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 export default {
-  components: {
-    SideBar,
-  },
   setup() {
     toast.success("Welcome To User Data Table", {
       position: "bottom-right",
@@ -99,7 +94,7 @@ export default {
         });
         return;
       }
-      axios
+      this.$axios
         .delete(`http://127.0.0.1:8000/api/users/${id}`)
         .then(() => {
           this.setupSuccess_deleted();
@@ -112,7 +107,7 @@ export default {
         });
     },
     getData() {
-      axios
+      this.$axios
         .get("http://127.0.0.1:8000/api/users")
         .then((response) => {
           console.log(response.data);

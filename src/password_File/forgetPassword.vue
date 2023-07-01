@@ -26,7 +26,6 @@
   >
 </template>
 <script>
-import axios from "axios";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 export default {
@@ -39,7 +38,7 @@ export default {
   },
   methods: {
     forget_Password() {
-      axios
+      this.$axios
         .post("http://127.0.0.1:8000/api/forgetpassword", {
           email: this.data.email,
         })

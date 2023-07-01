@@ -106,14 +106,9 @@
   </base-card>
 </template>
 <script>
-import axios from "axios";
-import SideBar from "../sidebar_File/sideBar.vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 export default {
-  components: {
-    SideBar,
-  },
   setup() {
     toast.success("Welcome To  User Page", {
       autoClose: 2000,
@@ -157,7 +152,7 @@ export default {
     // for the store or update the data
     storeData() {
       if (this.editingId) {
-        axios
+        this.$axios
           .put(`http://127.0.0.1:8000/api/users/${this.editingId}`, {
             first_name: this.data.first_name,
             last_name: this.data.last_name,
@@ -174,7 +169,7 @@ export default {
             }, 3000);
           });
       } else {
-        axios
+        this.$axios
           .post("http://127.0.0.1:8000/api/users", {
             first_name: this.data.first_name,
             last_name: this.data.last_name,
@@ -200,7 +195,7 @@ export default {
     },
     // get data from role api
     getData() {
-      axios
+      this.$axios
         .get("http://127.0.0.1:8000/api/roles-list")
         .then((response) => {
           this.roles = response.data.data;

@@ -54,14 +54,9 @@
   </div>
 </template>
 <script>
-import axios from "axios";
-import SideBar from "../sidebar_File/sideBar.vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 export default {
-  components: {
-    SideBar,
-  },
   setup() {
     toast.success("Welcome To Role Table", {
       position: "bottom-right",
@@ -78,7 +73,7 @@ export default {
   },
   methods: {
     getData() {
-      axios
+      this.$axios
         .get("http://127.0.0.1:8000/api/roles")
         .then((response) => {
           console.log(response.data.data);
@@ -98,7 +93,7 @@ export default {
     },
     // for delete
     deleteUsers(id) {
-      axios
+      this.$axios
         .delete(`http://127.0.0.1:8000/api/roles/${id}`)
         .then(() => {
           this.setupSuccess_deleted();
@@ -112,7 +107,7 @@ export default {
     },
     // for copy
     copyRole(id) {
-      axios
+      this.$axios
         .get(`http://127.0.0.1:8000/api/roles/${id}/edit`)
         .then((response) => {
           console.log(response);
@@ -168,7 +163,7 @@ export default {
     },
     // for the delete
     setupErrordelete() {
-      toast.error("Cannot delete the role. It is in use by some users.", {
+      toast.error("Role is in use.", {
         autoClose: 2000,
         position: "bottom-right",
       });

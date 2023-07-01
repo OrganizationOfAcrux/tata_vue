@@ -59,6 +59,8 @@
               icon="fa-solid fa-user"
               id="font1"
               class="success"
+              @mouseover="showTooltip"
+              @mouseleave="hideTooltip"
             /></button
         ></span>
       </div>
@@ -66,8 +68,6 @@
   </div>
 </template>
 <script>
-import axios from "axios";
-import { mapState } from "vuex";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 export default {
@@ -79,6 +79,7 @@ export default {
       },
       isUserDataPage: false,
       isRolePage: false,
+      selectedData: null,
     };
   },
   // for the button colour
@@ -103,24 +104,6 @@ export default {
       this.isRolePage = false;
     }
   },
-  // this is for the take data from  api response and display in the hover property
-  computed: {
-    ...mapState(["apiResponse"]),
-
-    selectedData() {
-      let storedData = JSON.parse(localStorage.getItem("storeData"));
-
-      if (storedData && storedData.apiResponse && storedData.apiResponse.data) {
-        const { email, username } = storedData.apiResponse.data;
-        return { email, username };
-      } else if (this.apiResponse && this.apiResponse.data) {
-        const { email, username } = this.apiResponse.data;
-        return { email, username };
-      } else {
-        return null;
-      }
-    },
-  },
   methods: {
     handleImageClick() {
       this.$router.push("/home");
@@ -136,10 +119,12 @@ export default {
       this.isRolePage = true;
     },
     logout_User() {
-      axios
+      this.$axios
         .get("http://127.0.0.1:8000/api/logout")
         .then(() => {
-          localStorage.clear();
+          localStorage.removeItem("storeData");
+          // for delete the window history after the
+          window.history.replaceState({}, "", "/login");
           this.setupSuccess_logout();
           setTimeout(() => {
             this.$router.push("/login");
@@ -148,6 +133,19 @@ export default {
         .catch(() => {
           this.setuperror();
         });
+    },
+    // Retrieve data from localStorage and set it to selectedData
+    showTooltip() {
+      this.tooltipVisible = true;
+      const storedData = JSON.parse(localStorage.getItem("storeData"));
+      if (storedData) {
+        this.selectedData = storedData;
+      }
+    },
+
+    // Hide tooltip
+    hideTooltip() {
+      this.tooltipVisible = false;
     },
     // for success logout
     setupSuccess_logout() {
