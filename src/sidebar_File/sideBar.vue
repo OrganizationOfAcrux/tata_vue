@@ -34,6 +34,15 @@
         <font-awesome-icon icon="fa-solid " class="nav-link" />Role
       </button>
     </div>
+    <br /><br />
+    <button
+      class="btn"
+      type="submit"
+      @click="button3"
+      :class="{ green2: isBookPage }"
+    >
+      Books
+    </button>
     <div class="mid2"></div>
     <div class="fot">
       <div id="tooltip">
@@ -79,29 +88,35 @@ export default {
       },
       isUserDataPage: false,
       isRolePage: false,
+      isBookPage: false,
       selectedData: null,
     };
   },
   // for the button colour
   created() {
-    if (this.$route.path === "/userData") {
+    if (this.$route.path === "/userData" || this.$route.path === "/addUser") {
       this.isUserDataPage = true;
       this.isRolePage = false;
-    } else if (this.$route.path === "/addUser") {
-      this.isUserDataPage = true;
-      this.isRolePage = false;
+      this.isBookPage = false;
     } else if (this.$route.path === "/home") {
       this.isUserDataPage = false;
       this.isRolePage = false;
-    } else if (this.$route.path === "/roletable") {
+      this.isBookPage = false;
+    } else if (
+      this.$route.path === "/roletable" ||
+      this.$route.path === "/addrole"
+    ) {
       this.isUserDataPage = false;
       this.isRolePage = true;
-    } else if (this.$route.path === "/addrole") {
+      this.isBookPage = false;
+    } else if (this.$route.path === "/books") {
+      this.isBookPage = true;
       this.isUserDataPage = false;
-      this.isRolePage = true;
+      this.isRolePage = false;
     } else {
       this.isUserDataPage = false;
       this.isRolePage = false;
+      this.isBookPage = false;
     }
   },
   methods: {
@@ -111,12 +126,24 @@ export default {
     // for the users table
     button() {
       this.$router.push("/userData");
-      console.log("define your table");
+      this.isUserDataPage = true;
+      this.isRolePage = false; // Add this line
+      this.isBookPage = false; // Add this line
     },
+
     // for the role table
     button2() {
       this.$router.push("/roletable");
       this.isRolePage = true;
+      this.isUserDataPage = false; // Add this line
+      this.isBookPage = false; // Add this line
+    },
+
+    button3() {
+      this.$router.push("/books");
+      this.isBookPage = true;
+      this.isUserDataPage = false; // Add this line
+      this.isRolePage = false; // Add this line
     },
     logout_User() {
       this.$axios
@@ -179,14 +206,19 @@ export default {
   font-size: 100%;
   min-width: 100%;
 }
+.green2 {
+  background-color: #009879;
+  font-size: 100%;
+  min-width: 100%;
+}
 .head {
   height: 15%;
 }
 .mid {
-  height: 10%;
+  height: 15%;
 }
-.mid {
-  height: 70%;
+.mid2 {
+  height: 60%;
 }
 .fot {
   height: 5%;

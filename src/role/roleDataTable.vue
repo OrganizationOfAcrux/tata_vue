@@ -76,7 +76,6 @@ export default {
       this.$axios
         .get("http://127.0.0.1:8000/api/roles")
         .then((response) => {
-          console.log(response.data.data);
           this.users = response.data.data.map((user) => ({
             id: user.id,
             name: user.name,

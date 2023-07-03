@@ -8,8 +8,8 @@ import SideBar from './sidebar_File/sideBar.vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import BaseCard from './basecard/baseCard.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faAt, faCopy, faEdit, faHouse, faTrash, faUser, faUserMinus, faUserPlus, faUserSecret } from '@fortawesome/free-solid-svg-icons';
-library.add(faUserSecret, faHouse, faUser, faEdit, faTrash, faUserPlus, faUserMinus, faAt, faCopy);
+import { faAt, faCopy, faEdit, faHouse, faMinus, faPlus, faTrash, faUser, faUserMinus, faUserPlus, faUserSecret } from '@fortawesome/free-solid-svg-icons';
+library.add(faUserSecret, faHouse, faUser, faEdit, faTrash, faUserPlus, faUserMinus, faAt, faCopy, faPlus, faMinus);
 const app = createApp(App)
     .component('font-awesome-icon', FontAwesomeIcon)
     .component('SideBar', SideBar)

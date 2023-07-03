@@ -56,6 +56,25 @@
         </table>
       </div>
     </div>
+    <!-- Pagination -->
+    <div class="pagination" style="margin-left: 45%">
+      <button
+        v-for="(link, index) in urlLinks"
+        :key="index"
+        @click="getData(link.url)"
+        :class="{ 'pagination-button-active': link.active === true }"
+      >
+        {{
+          link.label.indexOf("Previous") >= 0
+            ? "Previous"
+            : link.label.indexOf("Next") >= 0
+            ? "Next"
+            : link.label
+        }}
+      </button>
+    </div>
+
+    <!-- Pagination end -->
   </div>
 </template>
 <script>
@@ -72,10 +91,12 @@ export default {
     return {
       users: [],
       selected: [],
+      url: "http://127.0.0.1:8000/api/users?page=1",
+      urlLinks: [],
     };
   },
   created() {
-    this.getData();
+    this.getData(this.url);
   },
   methods: {
     deleteUsers(id) {
@@ -103,24 +124,17 @@ export default {
           this.setuperror();
         })
         .finally(() => {
-          this.getData();
+          this.getData(this.url);
         });
     },
-    getData() {
+    // get for api call for the pagination
+    getData(url) {
       this.$axios
-        .get("http://127.0.0.1:8000/api/users")
+        .get(url)
         .then((response) => {
-          console.log(response.data);
-          this.users = response.data.data.map((user) => ({
-            id: user.id,
-            first_name: user.first_name,
-            last_name: user.last_name,
-            email: user.email,
-            username: user.username,
-            phone_number: user.phone_number,
-            role_name: user.role_name,
-            role_id: user.role_id,
-          }));
+          console.log(response.data.data.links); // Check the API response structure in the console
+          this.users = response.data.data.data;
+          this.urlLinks = response.data.data.links;
         })
         .catch((error) => {
           console.error(error);
@@ -252,5 +266,11 @@ export default {
   background-color: transparent;
   font-size: 144%;
   margin-left: 15%;
+}
+
+.pagination-button-active {
+  background-color: #009879;
+  color: white;
+  margin: 0 5px;
 }
 </style>
