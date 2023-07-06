@@ -14,11 +14,11 @@
             style="
               font-size: 100%;
               margin-left: 100%;
-              background-color: #009879;
+              background-color: #00744c;
             "
           >
             <font-awesome-icon icon="fa-solid fa-user-plus" class="font1" />
-            Add User
+            Add
           </button>
         </div>
       </div>
@@ -32,7 +32,7 @@
               <th>Email</th>
               <th>Phone</th>
               <th>Role</th>
-              <th>Action</th>
+              <th style="width: 10%">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -57,12 +57,14 @@
       </div>
     </div>
     <!-- Pagination -->
-    <div class="pagination" style="margin-left: 45%">
+    <div class="pagination" style="margin-left: 10%">
       <button
         v-for="(link, index) in urlLinks"
         :key="index"
         @click="getData(link.url)"
         :class="{ 'pagination-button-active': link.active === true }"
+        :disabled="isButtonDisabled(link.url)"
+        style="border-radius: 5%; margin: 1%; border-radius: 30%"
       >
         {{
           link.label.indexOf("Previous") >= 0
@@ -94,6 +96,13 @@ export default {
       url: "http://127.0.0.1:8000/api/users?page=1",
       urlLinks: [],
     };
+  },
+  computed: {
+    isButtonDisabled() {
+      return (url) => {
+        return url === null;
+      };
+    },
   },
   created() {
     this.getData(this.url);
@@ -132,7 +141,6 @@ export default {
       this.$axios
         .get(url)
         .then((response) => {
-          console.log(response.data.data.links); // Check the API response structure in the console
           this.users = response.data.data.data;
           this.urlLinks = response.data.data.links;
         })
@@ -198,8 +206,7 @@ export default {
 .top-section {
   flex: 1;
   background-color: white;
-  margin-left: 74rem;
-  margin-top: 3rem;
+  margin-top: 1rem;
 }
 .button-container {
   display: flex;
@@ -213,9 +220,9 @@ export default {
 .bottom-section {
   margin-left: 7.8rem;
   flex: 9;
-  display: flex;
   width: 100%;
 }
+/* table Style */
 .styled-table {
   margin-left: 17rem;
   border-collapse: collapse;
@@ -230,7 +237,7 @@ export default {
   font-style: italic;
 }
 .styled-table thead tr {
-  background-color: #009879;
+  background-color: #00744c;
   color: #ffffff;
   text-align: left;
 }
@@ -248,14 +255,14 @@ export default {
 }
 
 .styled-table tbody tr:last-of-type {
-  border-bottom: 2px solid #009879;
+  border-bottom: 2px solid #00744c;
 }
 .styled-table tbody tr.active-row {
   font-weight: bold;
-  color: #009879;
+  color: #00744c;
 }
 .btn1 {
-  color: #009879;
+  color: #00744c;
   border: transparent;
   background-color: transparent;
   font-size: 144%;
@@ -269,7 +276,7 @@ export default {
 }
 
 .pagination-button-active {
-  background-color: #009879;
+  background-color: #00744c;
   color: white;
   margin: 0 5px;
 }

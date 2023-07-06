@@ -24,26 +24,35 @@
         @click="button"
         :class="{ green: isUserDataPage }"
       >
-        <font-awesome-icon icon="fa-solid " class="nav-link" />Users</button
+        Users</button
       ><br /><br /><button
         class="btn"
         type="submit"
         @click="button2"
         :class="{ green1: isRolePage }"
       >
-        <font-awesome-icon icon="fa-solid " class="nav-link" />Role
+        Role
       </button>
     </div>
-    <br /><br />
-    <button
-      class="btn"
-      type="submit"
-      @click="button3"
-      :class="{ green2: isBookPage }"
-    >
-      Books
-    </button>
-    <div class="mid2"></div>
+
+    <div class="mid2">
+      <button
+        class="btn"
+        type="submit"
+        @click="button3"
+        :class="{ green2: isBookPage }"
+      >
+        Books</button
+      ><br /><br />
+      <button
+        class="btn"
+        type="submit"
+        @click="button4"
+        :class="{ green3: isBookLibraryPage }"
+      >
+        Library
+      </button>
+    </div>
     <div class="fot">
       <div id="tooltip">
         <span id="tooltipText"
@@ -58,7 +67,7 @@
         <span
           ><button
             style="
-              background-color: #009879;
+              background-color: #00744c;
               height: 50px;
               min-width: 100%;
               border-color: transparent;
@@ -89,6 +98,7 @@ export default {
       isUserDataPage: false,
       isRolePage: false,
       isBookPage: false,
+      isBookLibraryPage: false,
       selectedData: null,
     };
   },
@@ -98,10 +108,7 @@ export default {
       this.isUserDataPage = true;
       this.isRolePage = false;
       this.isBookPage = false;
-    } else if (this.$route.path === "/home") {
-      this.isUserDataPage = false;
-      this.isRolePage = false;
-      this.isBookPage = false;
+      this.isBookLibraryPage = false;
     } else if (
       this.$route.path === "/roletable" ||
       this.$route.path === "/addrole"
@@ -109,16 +116,28 @@ export default {
       this.isUserDataPage = false;
       this.isRolePage = true;
       this.isBookPage = false;
-    } else if (this.$route.path === "/books") {
-      this.isBookPage = true;
+      this.isBookLibraryPage = false;
+    } else if (
+      this.$route.path === "/books" ||
+      this.$route.path === "/addbook"
+    ) {
       this.isUserDataPage = false;
       this.isRolePage = false;
+      this.isBookPage = true;
+      this.isBookLibraryPage = false;
+    } else if (this.$route.path === "/libraryPage") {
+      this.isUserDataPage = false;
+      this.isRolePage = false;
+      this.isBookPage = false;
+      this.isBookLibraryPage = true;
     } else {
       this.isUserDataPage = false;
       this.isRolePage = false;
       this.isBookPage = false;
+      this.isBookLibraryPage = false;
     }
   },
+
   methods: {
     handleImageClick() {
       this.$router.push("/home");
@@ -129,6 +148,7 @@ export default {
       this.isUserDataPage = true;
       this.isRolePage = false; // Add this line
       this.isBookPage = false; // Add this line
+      this.isBookLibraryPage = false;
     },
 
     // for the role table
@@ -137,6 +157,7 @@ export default {
       this.isRolePage = true;
       this.isUserDataPage = false; // Add this line
       this.isBookPage = false; // Add this line
+      this.isBookLibraryPage = false;
     },
 
     button3() {
@@ -144,6 +165,14 @@ export default {
       this.isBookPage = true;
       this.isUserDataPage = false; // Add this line
       this.isRolePage = false; // Add this line
+      this.isBookLibraryPage = false;
+    },
+    button4() {
+      this.$router.push("/libraryPage");
+      this.isBookPage = false;
+      this.isUserDataPage = false; // Add this line
+      this.isRolePage = false; // Add this line
+      this.isBookLibraryPage = true;
     },
     logout_User() {
       this.$axios
@@ -197,17 +226,22 @@ export default {
     hue-rotate(139deg) brightness(91%) contrast(100%);
 }
 .green {
-  background-color: #009879;
+  background-color: #00744c;
   font-size: 100%;
   min-width: 100%;
 }
 .green1 {
-  background-color: #009879;
+  background-color: #00744c;
   font-size: 100%;
   min-width: 100%;
 }
 .green2 {
-  background-color: #009879;
+  background-color: #00744c;
+  font-size: 100%;
+  min-width: 100%;
+}
+.green3 {
+  background-color: #00744c;
   font-size: 100%;
   min-width: 100%;
 }
@@ -215,10 +249,10 @@ export default {
   height: 15%;
 }
 .mid {
-  height: 15%;
+  height: 20%;
 }
 .mid2 {
-  height: 60%;
+  height: 55%;
 }
 .fot {
   height: 5%;

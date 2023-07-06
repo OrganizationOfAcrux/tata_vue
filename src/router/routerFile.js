@@ -8,6 +8,8 @@ import resetPassword from '../password_File/resetPassword.vue'
 import roleTable from '../role/roleDataTable.vue'
 import addRole from '../role/addRole.vue'
 import books from '../library_file/book_file.vue'
+import addbook from '../library_file/addBook.vue'
+import library from '../library_file/librarayPage.vue'
 
 const router = createRouter({
     history: createWebHistory(),
@@ -44,7 +46,17 @@ const router = createRouter({
         },
         {
             path: '/books', component: books,
-            // meta: { requiresAuth: true }
+            meta: { requiresAuth: true }
+
+        },
+        {
+            path: '/addbook', component: addbook,
+            meta: { requiresAuth: true }
+
+        },
+        {
+            path: '/libraryPage', component: library,
+            meta: { requiresAuth: true }
 
         }
     ]

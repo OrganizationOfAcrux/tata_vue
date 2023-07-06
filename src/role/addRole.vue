@@ -18,7 +18,7 @@
           /><br /><br />
         </div>
         <div class="form-group">
-          <label for="password" class="passwordlabel">description:</label><br />
+          <label for="password" class="passwordlabel">Description:</label><br />
           <textarea
             name="description"
             id=""
@@ -161,16 +161,12 @@ form {
   height: 2rem;
   font-size: 1rem;
 }
-/* .emaillabel {
+.emaillabel {
   font-size: 130%;
   margin-right: 73%;
 }
 .passwordlabel {
   font-size: 130%;
-  margin-right: 67%;
+  margin-right: 66%;
 }
-#forgot {
-  margin-top: 1%;
-  margin-left: 26%;
-} */
 </style>

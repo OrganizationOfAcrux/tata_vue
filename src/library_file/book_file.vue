@@ -5,6 +5,23 @@
     </div>
     <div class="content">
       <div class="top-section">
+        <div class="button-container">
+          <button
+            class="btn btn-large btn-success"
+            id="btn1"
+            type="submit"
+            @click="addBook"
+            style="
+              font-size: 100%;
+              margin-left: 100%;
+              background-color: #00744c;
+            "
+          >
+            <font-awesome-icon icon="fa-solid fa-user-plus" class="font1" />
+            Add
+          </button>
+        </div>
+
         <div class="button-container"></div>
       </div>
       <div class="bottom-section">
@@ -14,7 +31,7 @@
               <th>Subject</th>
               <th>Class</th>
               <th>Available</th>
-              <th>Button</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -23,11 +40,11 @@
               <td>{{ user.class }}</td>
               <td>{{ user.available }}</td>
               <td>
-                <button class="btn2" @click="addBook(user)">
-                  <font-awesome-icon icon="fa-solid fa-plus" />
-                </button>
-                <button class="btn3" @click="minusBook(user)">
-                  <font-awesome-icon icon="fa-solid fa-minus" />
+                <button class="btn1" @click="editUserData(user)">
+                  <font-awesome-icon icon="fa-solid fa-edit" /></button
+                >&nbsp;&nbsp;
+                <button class="btn2" @click="deleteUsers(user.id)">
+                  <font-awesome-icon icon="fa-solid fa-trash" />
                 </button>
               </td>
             </tr>
@@ -35,6 +52,27 @@
         </table>
       </div>
     </div>
+    <!-- Pagination -->
+    <div class="pagination" style="margin-left: 10%">
+      <button
+        v-for="(link, index) in urlLinks"
+        :key="index"
+        @click="getData(link.url)"
+        :class="{ 'pagination-button-active': link.active === true }"
+        :disabled="isButtonDisabled(link.url)"
+        style="border-radius: 5%; margin: 1%; border-radius: 30%"
+      >
+        {{
+          link.label.indexOf("Previous") >= 0
+            ? "Previous"
+            : link.label.indexOf("Next") >= 0
+            ? "Next"
+            : link.label
+        }}
+      </button>
+    </div>
+
+    <!-- Pagination end -->
   </div>
 </template>
 <script>
@@ -42,7 +80,7 @@ import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 export default {
   setup() {
-    toast.success("Welcome To Role Table", {
+    toast.success("Welcome To Book Table", {
       position: "bottom-right",
       autoClose: 2000,
     });
@@ -50,73 +88,64 @@ export default {
   data() {
     return {
       users: [],
+      url: "http://127.0.0.1:8000/api/books?page=1",
+      urlLinks: [],
     };
   },
+
+  computed: {
+    isButtonDisabled() {
+      return (url) => {
+        return url === null;
+      };
+    },
+  },
   created() {
-    this.getData();
+    this.getData(this.url);
   },
   methods: {
-    getData() {
+    getData(url) {
       this.$axios
-        .get("http://127.0.0.1:8000/api/libraries")
+        .get(url)
         .then((response) => {
-          this.users = response.data.data.map((user) => ({
-            id: user.user_id,
-            subject: user.subject,
-            class: user.class,
-            available: user.available,
-          }));
+          this.users = response.data.data.data;
+          this.urlLinks = response.data.data.links;
         })
         .catch((error) => {
           console.error(error);
+        });
+    },
+
+    deleteUsers(id) {
+      this.$axios
+        .delete(`http://127.0.0.1:8000/api/books/${id}`)
+        .then(() => {
+          this.setupSuccess_deleted();
+        })
+        .catch(() => {
           this.setupError();
         })
         .finally(() => {
-          this.isLoading = false;
+          this.getData(this.url);
         });
     },
-    // for the after add the role push  to next page
-    // addBook(user) {
-    //   if (user.available > 0) {
-    //     this.$axios
-    //       .post(`http://127.0.0.1:8000/api/libraries/${user.id}`)
-    //       .then((response) => {
-    //         // Assuming the API responds with updated user data
-    //         user.available = response.data.available;
-    //         this.setupSuccess_copied();
-    //       })
-    //       .catch((error) => {
-    //         console.error(error);
-    //         this.setupError();
-    //       });
-    //     console.log("okk added");
-    //   } else {
-    //     // Show some kind of error message or disable the button
-    //     console.log("No more books available for this subject.");
-    //   }
-    // },
-    // minusBook(user) {
-    //   if (user.available > 0) {
-    //     // this.$axios
-    //     //   .post(`http://127.0.0.1:8000/api/minus-book/${user.id}`)
-    //     //   .then((response) => {
-    //     //     // Assuming the API responds with updated user data
-    //     //     user.available = response.data.available;
-    //     //     this.setupSuccess_copied();
-    //     //   })
-    //     //   .catch((error) => {
-    //     //     console.error(error);
-    //     //     this.setupError();
-    //     //   });
-    //     console.log("okk removed");
-    //   } else {
-    //     // Show some kind of error message or disable the button
-    //     console.log("No books available to remove for this subject.");
-    //   }
-    // },
+    editUserData(user) {
+      this.$router.push({
+        path: "/addbook",
+        query: {
+          id: user.id,
+          class: user.class,
+          subject: user.subject,
+          available: user.available,
+        },
+      });
+    },
+    addBook() {
+      this.$router.push("/addbook");
+    },
     // for success copied
-    setupSuccess_copied() {
-      toast.success("Role copied successfully", {
+    setupSuccess_deleted() {
+      toast.success("Successfully Deleted", {
         autoClose: 2000,
         position: "bottom-right",
       });
@@ -153,8 +182,7 @@ export default {
 .top-section {
   flex: 1;
   background-color: white;
-  margin-left: 74rem;
-  margin-top: 3rem;
+  margin-top: 1rem;
 }
 .button-container {
   display: flex;
@@ -187,7 +215,7 @@ export default {
   width: 100%;
 }
 .styled-table thead tr {
-  background-color: #009879;
+  background-color: #00744c;
   color: #ffffff;
   text-align: left;
 }
@@ -205,78 +233,27 @@ export default {
 }
 
 .styled-table tbody tr:last-of-type {
-  border-bottom: 2px solid #009879;
+  border-bottom: 2px solid #00744c;
 }
 .styled-table tbody tr.active-row {
   font-weight: bold;
   color: #009879;
 }
-.btn2 {
-  color: #009879;
-  border: transparent;
-  background-color: transparent;
-  font-size: 144%;
-  margin-left: 3rem;
-  /* margin-right: -3rem; */
-}
 .btn1 {
-  color: yellow;
+  color: #00744c;
   border: transparent;
   background-color: transparent;
   font-size: 144%;
 }
-.btn3 {
-  color: red;
+.btn2 {
+  color: rgb(255, 0, 0);
   border: transparent;
   background-color: transparent;
   font-size: 144%;
-  margin-left: 10%;
+}
+.pagination-button-active {
+  background-color: #00744c;
+  color: white;
+  margin: 0 5px;
 }
 </style>
-
-<!-- 
-    this work for counting
-     addbook() {
-    if (this.users.length > 0) {
-      const bookId = this.users[0].id; // Assuming the ID of the book is stored in the 'id' property.
-      const newAvailable = Math.max(0, this.users[0].available - 1);
-      
-      // Make an API call to update the 'available' value in the backend
-      this.$axios
-        .put(`http://127.0.0.1:8000/api/books/${bookId}`, { available: newAvailable })
-        .then((response) => {
-          // Update the 'available' value in the frontend after successful update in the backend
-          this.users[0].available = newAvailable;
-          this.setupSuccess_copied();
-        })
-        .catch((error) => {
-          console.error(error);
-          this.setupError();
-        });
-    } else {
-      this.setupError();
-    }
-  },
-
-  minusbook() {
-    if (this.users.length > 0) {
-      const bookId = this.users[0].id; // Assuming the ID of the book is stored in the 'id' property.
-      const newAvailable = this.users[0].available + 1;
-
-      // Make an API call to update the 'available' value in the backend
-      this.$axios
-        .put(`http://127.0.0.1:8000/api/books/${bookId}`, { available: newAvailable })
-        .then((response) => {
-          // Update the 'available' value in the frontend after successful update in the backend
-          this.users[0].available = newAvailable;
-          this.setupSuccess_copied();
-        })
-        .catch((error) => {
-          console.error(error);
-          this.setupError();
-        });
-    } else {
-      this.setupError();
-    }
-  },
- -->

@@ -14,7 +14,7 @@
             style="
               font-size: 100%;
               margin-left: 100%;
-              background-color: #009879;
+              background-color: #00744c;
             "
           >
             <font-awesome-icon icon="fa-solid fa-user-plus" class="font1" />
@@ -51,6 +51,27 @@
         </table>
       </div>
     </div>
+    <!-- Pagination -->
+    <div class="pagination" style="margin-left: 10%">
+      <button
+        v-for="(link, index) in urlLinks"
+        :key="index"
+        @click="getData(link.url)"
+        :class="{ 'pagination-button-active': link.active === true }"
+        :disabled="isButtonDisabled(link.url)"
+        style="border-radius: 5%; margin: 1%; border-radius: 30%"
+      >
+        {{
+          link.label.indexOf("Previous") >= 0
+            ? "Previous"
+            : link.label.indexOf("Next") >= 0
+            ? "Next"
+            : link.label
+        }}
+      </button>
+    </div>
+
+    <!-- Pagination end -->
   </div>
 </template>
 <script>
@@ -66,28 +87,34 @@ export default {
   data() {
     return {
       users: [],
+      //for the pagination
+      url: "http://127.0.0.1:8000/api/roles?page=1",
+      urlLinks: [],
     };
   },
+  // for the pagination
+  computed: {
+    isButtonDisabled() {
+      return (url) => {
+        return url === null;
+      };
+    },
+  },
   created() {
-    this.getData();
+    this.getData(this.url);
   },
   methods: {
-    getData() {
+    getData(url) {
       this.$axios
-        .get("http://127.0.0.1:8000/api/roles")
+        .get(url)
         .then((response) => {
-          this.users = response.data.data.map((user) => ({
-            id: user.id,
-            name: user.name,
-            description: user.description,
-          }));
+          console.log(response.data.data.data);
+          this.users = response.data.data.data;
+          // for taking links for paginanation
+          this.urlLinks = response.data.data.links;
         })
         .catch((error) => {
           console.error(error);
-          this.setupError();
-        })
-        .finally(() => {
-          this.isLoading = false;
         });
     },
     // for delete
@@ -101,7 +128,7 @@ export default {
           this.setupErrordelete();
         })
         .finally(() => {
-          this.getData();
+          this.getData(this.url);
         });
     },
     // for copy
@@ -121,7 +148,7 @@ export default {
           this.setupError();
         })
         .finally(() => {
-          this.getData();
+          this.getData(this.url);
         });
     },
     // for the after add the role push  to next page
@@ -179,6 +206,11 @@ export default {
   display: flex;
   height: 100vh;
 }
+.pagination-button-active {
+  background-color: #00744c;
+  color: white;
+  margin: 0 5px;
+}
 
 .sidebar {
   flex: 1;
@@ -192,8 +224,8 @@ export default {
 .top-section {
   flex: 1;
   background-color: white;
-  margin-left: 74rem;
-  margin-top: 3rem;
+  /* margin-left: 74rem; */
+  margin-top: 1rem;
 }
 .button-container {
   display: flex;
@@ -208,7 +240,7 @@ export default {
 .bottom-section {
   margin-left: 7.8rem;
   flex: 9;
-  display: flex;
+  /* display: flex; */
   width: 100%;
 }
 .styled-table {
@@ -226,7 +258,7 @@ export default {
   width: 100%;
 }
 .styled-table thead tr {
-  background-color: #009879;
+  background-color: #00744c;
   color: #ffffff;
   text-align: left;
 }
@@ -244,14 +276,14 @@ export default {
 }
 
 .styled-table tbody tr:last-of-type {
-  border-bottom: 2px solid #009879;
+  border-bottom: 2px solid #00744c;
 }
 .styled-table tbody tr.active-row {
   font-weight: bold;
-  color: #009879;
+  color: #00744c;
 }
 .btn2 {
-  color: #009879;
+  color: #00744c;
   border: transparent;
   background-color: transparent;
   font-size: 144%;
