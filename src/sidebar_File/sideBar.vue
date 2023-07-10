@@ -53,14 +53,15 @@
         Library
       </button>
       <br /><br />
-      <button
+      <!-- <button
         class="btn"
         type="submit"
         @click="button5"
         :class="{ green4: isHistoryPage }"
       >
         History
-      </button>
+      </button> -->
+      <!-- this is extra button -->
     </div>
     <div class="fot">
       <div id="tooltip">

@@ -149,7 +149,7 @@
       <!-- Pagination end -->
       <!-- History Table -->
       <div class="historyTable" v-if="selectedStudent">
-        <h2>:History Table -></h2>
+        <h2>History Table :-></h2>
 
         <!--for the hide table befor the selectd the serachname if remove this only remove the v-if condition  -->
         <table border="2" class="styled-table">
@@ -165,8 +165,14 @@
             <template v-if="historyData && historyData.length > 0">
               <tr v-for="user in historyData" :key="user.id">
                 <td>{{ user.book_name }}</td>
-                <td>{{ user.created_at }}</td>
-                <td>{{ user.updated_at }}</td>
+                <td>{{ formatDate(user.created_at) }}</td>
+                <td>
+                  {{
+                    user.deleted_at
+                      ? formatDate(user.deleted_at)
+                      : "Book not returned yet"
+                  }}
+                </td>
               </tr>
             </template>
             <template v-else>
@@ -198,8 +204,8 @@ export default {
       users: [],
       books: [],
       Students: [],
+      selectedStudent: null,
       historyData: [],
-
       searchname: "",
       options: [],
       library: {
@@ -278,37 +284,11 @@ export default {
         selectedStudent.first_name + " " + selectedStudent.last_name;
       this.Students = [];
       this.selectedStudent = selectedStudent;
-      this.historyData = []; // for the hide table before selcted the searchname
+      this.historyData = [];
       this.library.id = selectedStudent.id;
-      this.sendSelectedNameToAPIForHistory(this.library.id);
+      this.sendSelectedNameToAPIForHistory();
     },
-    // for the send selected name Id and get the response of history and fill in the history table
-    sendSelectedNameToAPIForHistory() {
-      console.log("hjgsdakf;mpsd");
-      if (this.library.searchname) {
-        const payload = {
-          user_id: this.library.id, // Use the selected student's ID in the payload
-        };
-        const params = new URLSearchParams(payload);
-        console.log("sendSelectedNameToAPIForHistory called");
-        this.$axios
-          .get(`http://127.0.0.1:8000/api/libraries/history?${params}`)
-          .then((response) => {
-            console.log(response.data.data);
-            this.historyData = response.data.data;
-            // const responseData = response.data.data;
-            // if (Array.isArray(responseData.data.subjects)) {
-            //   this.historyData = responseData.data.subjects.map((subject) => {
-            //     return {
-            //       id: subject.id,
-            //       subject: subject.subject,
-            //     };
-            //   });
-            // }
-          })
-          .catch(() => {});
-      }
-    },
+
     // for the send selected class and selected name Id and get the response and fill in vuemultiselect dropdown
     sendSelectedClassToAPI() {
       if (this.library.selectedClass) {
@@ -384,6 +364,26 @@ export default {
         .catch((error) => {
           console.error(error);
         });
+    },
+    // for the send selected name Id and get the response of history and fill in the history table
+    sendSelectedNameToAPIForHistory() {
+      if (this.library.searchname) {
+        const userId = this.library.id;
+        this.$axios
+          .get(`http://127.0.0.1:8000/api/libraries/history/${userId}`)
+          .then((response) => {
+            this.historyData = response.data.data.libraries;
+            console.log(response.data.data.libraries);
+          })
+          .catch(() => {});
+      }
+    },
+
+    // this function work on the only print the date of history
+    formatDate(dateString) {
+      const date = new Date(dateString);
+      const options = { year: "numeric", month: "long", day: "numeric" };
+      return date.toLocaleDateString(undefined, options);
     },
     //
     cleantheinput() {
