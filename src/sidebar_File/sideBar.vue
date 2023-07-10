@@ -52,6 +52,15 @@
       >
         Library
       </button>
+      <br /><br />
+      <button
+        class="btn"
+        type="submit"
+        @click="button5"
+        :class="{ green4: isHistoryPage }"
+      >
+        History
+      </button>
     </div>
     <div class="fot">
       <div id="tooltip">
@@ -99,6 +108,7 @@ export default {
       isRolePage: false,
       isBookPage: false,
       isBookLibraryPage: false,
+      isHistoryPage: false,
       selectedData: null,
     };
   },
@@ -109,6 +119,7 @@ export default {
       this.isRolePage = false;
       this.isBookPage = false;
       this.isBookLibraryPage = false;
+      this.isHistoryPage = false;
     } else if (
       this.$route.path === "/roletable" ||
       this.$route.path === "/addrole"
@@ -117,6 +128,7 @@ export default {
       this.isRolePage = true;
       this.isBookPage = false;
       this.isBookLibraryPage = false;
+      this.isHistoryPage = false;
     } else if (
       this.$route.path === "/books" ||
       this.$route.path === "/addbook"
@@ -125,16 +137,25 @@ export default {
       this.isRolePage = false;
       this.isBookPage = true;
       this.isBookLibraryPage = false;
+      this.isHistoryPage = false;
     } else if (this.$route.path === "/libraryPage") {
       this.isUserDataPage = false;
       this.isRolePage = false;
       this.isBookPage = false;
       this.isBookLibraryPage = true;
+      this.isHistoryPage = false;
+    } else if (this.$route.path === "/historyPage") {
+      (this.isUserDataPage = false),
+        (this.isRolePage = false),
+        (this.isBookPage = false),
+        (this.isBookLibraryPage = false),
+        (this.isHistoryPage = true);
     } else {
       this.isUserDataPage = false;
       this.isRolePage = false;
       this.isBookPage = false;
       this.isBookLibraryPage = false;
+      this.isHistoryPage = false;
     }
   },
 
@@ -149,6 +170,7 @@ export default {
       this.isRolePage = false; // Add this line
       this.isBookPage = false; // Add this line
       this.isBookLibraryPage = false;
+      this.isHistoryPage = false;
     },
 
     // for the role table
@@ -158,14 +180,15 @@ export default {
       this.isUserDataPage = false; // Add this line
       this.isBookPage = false; // Add this line
       this.isBookLibraryPage = false;
+      this.isHistoryPage = false;
     },
-
     button3() {
       this.$router.push("/books");
       this.isBookPage = true;
       this.isUserDataPage = false; // Add this line
       this.isRolePage = false; // Add this line
       this.isBookLibraryPage = false;
+      this.isHistoryPage = false;
     },
     button4() {
       this.$router.push("/libraryPage");
@@ -173,6 +196,15 @@ export default {
       this.isUserDataPage = false; // Add this line
       this.isRolePage = false; // Add this line
       this.isBookLibraryPage = true;
+      this.isHistoryPage = false;
+    },
+    button5() {
+      this.$router.push("/historyPage");
+      this.isBookPage = false;
+      this.isUserDataPage = false; // Add this line
+      this.isRolePage = false; // Add this line
+      this.isBookLibraryPage = false;
+      this.isHistoryPage = true;
     },
     logout_User() {
       this.$axios
@@ -241,6 +273,11 @@ export default {
   min-width: 100%;
 }
 .green3 {
+  background-color: #00744c;
+  font-size: 100%;
+  min-width: 100%;
+}
+.green4 {
   background-color: #00744c;
   font-size: 100%;
   min-width: 100%;

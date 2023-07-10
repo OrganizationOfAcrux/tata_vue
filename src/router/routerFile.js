@@ -10,6 +10,7 @@ import addRole from '../role/addRole.vue'
 import books from '../library_file/book_file.vue'
 import addbook from '../library_file/addBook.vue'
 import library from '../library_file/librarayPage.vue'
+import history from '../library_file/historyPage.vue'
 
 const router = createRouter({
     history: createWebHistory(),
@@ -56,6 +57,11 @@ const router = createRouter({
         },
         {
             path: '/libraryPage', component: library,
+            meta: { requiresAuth: true }
+
+        },
+        {
+            path: '/historyPage', component: history,
             meta: { requiresAuth: true }
 
         }

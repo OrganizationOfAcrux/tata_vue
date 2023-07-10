@@ -93,10 +93,12 @@ export default {
     return {
       users: [],
       selected: [],
+      // for pagination
       url: "http://127.0.0.1:8000/api/users?page=1",
       urlLinks: [],
     };
   },
+  // for pagination
   computed: {
     isButtonDisabled() {
       return (url) => {
@@ -141,6 +143,7 @@ export default {
       this.$axios
         .get(url)
         .then((response) => {
+          console.log(response.data.data.data);
           this.users = response.data.data.data;
           this.urlLinks = response.data.data.links;
         })
