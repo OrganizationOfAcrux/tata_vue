@@ -81,17 +81,23 @@
 
         <div style="margin-left: 10%">
           <label for="name" class="rolelabel">Subject:</label><br />
-
           <VueMultiselect
             v-model="library.subjectId"
             :options="options"
             :multiple="true"
             :close-on-select="false"
             @select="onSelectSubject"
+            :disabled="disableSubjects"
             label="subject"
             track-by="id"
             style="width: 17rem"
           ></VueMultiselect>
+          <p v-if="disableSubjects" class="disabled-message">
+            You select 2 subject, that's your limit for once!
+          </p>
+          <p v-else class="enabled-message" style="color: rgb(21, 66, 244)">
+            You can select maximum 2 subjects.
+          </p>
         </div>
         <!-- multiselect end -->
         <!-- assign button -->
@@ -220,6 +226,9 @@ export default {
   },
 
   computed: {
+    disableSubjects() {
+      return this.library.subjectId.length >= 2;
+    },
     // for filtered the name of search student
     filteredStudents() {
       if (this.library.searchname) {
@@ -251,10 +260,16 @@ export default {
   methods: {
     onSelectSubject(selectedSubjects) {
       if (Array.isArray(selectedSubjects) && selectedSubjects.length > 0) {
-        this.library.subjectId = selectedSubjects[0].id;
+        this.library.subjectId = selectedSubjects.map((subject) => subject.id);
       } else {
-        this.library.subjectId = "";
+        this.library.subjectId = [];
       }
+      // Disable subjects
+      const selectedCount = this.library.subjectId.length;
+      this.options.forEach((option) => {
+        const isSelected = this.library.subjectId.includes(option.id);
+        option.$isDisabled = selectedCount >= 2 && !isSelected;
+      });
     },
     // for the book full data
     bookData() {
@@ -301,7 +316,7 @@ export default {
         this.$axios
           .get(`http://127.0.0.1:8000/api/libraries/search-subject?${params}`)
           .then((response) => {
-            this.option = response.data;
+            this.option = response;
             const responseData = response.data;
             if (Array.isArray(responseData.data.subjects)) {
               this.options = responseData.data.subjects.map((subject) => {
@@ -338,10 +353,15 @@ export default {
       this.$axios
         .delete(`http://127.0.0.1:8000/api/libraries/${id}`) // update the url
         .then((response) => {
-          console.log(response, "Good");
+          this.handleResponse(
+            response,
+            response.data.msg,
+            "Failed to retrieve history"
+          );
         })
         .catch((error) => {
-          console.log(error, "Face a Error");
+          // console.log(error, "Face a Error");
+          this.handleError(error, error.msg);
         })
         .finally(() => {
           this.getData(this.url);
@@ -357,25 +377,34 @@ export default {
         .then((response) => {
           // console.log(response);
           this.users = response.data.data.data;
+
           console.log(response.data.data.data);
           this.urlLinks = response.data.data.links;
           console.log(response.data.data.links);
         })
         .catch((error) => {
-          console.error(error);
+          // console.error(error);
+          this.handleError(error, error.msg);
         });
     },
     // for the send selected name Id and get the response of history and fill in the history table
     sendSelectedNameToAPIForHistory() {
       if (this.library.searchname) {
-        const userId = this.library.id;
+        const user_id = this.library.id;
+
         this.$axios
-          .get(`http://127.0.0.1:8000/api/libraries/history/${userId}`)
+          .get(`http://127.0.0.1:8000/api/libraries/history/${user_id}`)
           .then((response) => {
             this.historyData = response.data.data.libraries;
-            console.log(response.data.data.libraries);
+            this.handleResponse(
+              response,
+              response.data.msg,
+              "Failed to retrieve history"
+            );
           })
-          .catch(() => {});
+          .catch((error) => {
+            this.handleError(error, error.msg);
+          });
       }
     },
 
@@ -391,6 +420,30 @@ export default {
       this.library.selectedClass = "";
       this.library.subjectId = "";
     },
+    // this for show the backend success msg
+    handleResponse(response, successMessage, defaultMessage) {
+      if (response.data.success) {
+        toast.success(successMessage, {
+          position: "bottom-right",
+          autoClose: 2000,
+        });
+      } else {
+        const errorMessage = response.data.message || defaultMessage;
+        toast.error(errorMessage, {
+          position: "bottom-right",
+          autoClose: 2000,
+        });
+      }
+    },
+    // this function work on the every error msg catch
+    handleError(error, defaultMessage) {
+      const errorMessage = error.response.data.msg || defaultMessage;
+      console.log(errorMessage);
+      toast.error(errorMessage, {
+        position: "bottom-right",
+        autoClose: 2000,
+      });
+    },
   },
 };
 </script>
@@ -400,6 +453,10 @@ export default {
 }
 .filtered-names {
   margin-top: 10px;
+}
+.disabled-message {
+  color: red;
+  margin-top: 0.5rem;
 }
 .container {
   display: flex;
