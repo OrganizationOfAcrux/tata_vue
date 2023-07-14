@@ -58,25 +58,36 @@ export default {
           confirm_password: this.data.confirm_password,
           token: this.$route.params.token,
         })
-        .then(() => {
-          toast.success("Your Password Updated", {
-            autoClose: 1000,
-            position: "bottom-right",
-          });
+        .then((response) => {
+          this.handleResponse(response, response.data.msg);
           setTimeout(() => {
             this.$router.push("/login");
-          }, 2000);
+          }, 3000);
         })
-        .catch(() => {
-          toast.error("Your password and confirm_Password does not match", {
-            autoClose: 2000,
-            position: "bottom-right",
-          });
+        .catch((error) => {
+          this.handleError(error, error.msg);
         });
       this.clearForm();
     },
     clearForm() {
       (this.data.confirm_password = ""), (this.data.password = "");
+    },
+    // this for show the backend success msg
+    handleResponse(response, successMessage) {
+      if (response.data.success) {
+        toast.success(successMessage, {
+          position: "bottom-right",
+          autoClose: 2000,
+        });
+      }
+    },
+    // this function work on the every error msg catch
+    handleError(error, defaultMessage) {
+      const errorMessage = error.response.data.msg || defaultMessage;
+      toast.error(errorMessage, {
+        position: "bottom-right",
+        autoClose: 2000,
+      });
     },
   },
 };

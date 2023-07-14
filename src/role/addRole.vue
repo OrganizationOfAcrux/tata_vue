@@ -71,16 +71,15 @@ export default {
             name: this.data.name,
             description: this.data.description,
           })
-          .then(() => {
-            this.setupSuccess_update();
+          .then((response) => {
+            this.handleResponse(response, response.data.msg);
             setTimeout(() => {
               this.clearForm();
-
               this.$router.push("/roletable");
             }, 3000);
           })
           .catch((error) => {
-            console.log(error);
+            this.handleError(error, error.msg);
           });
       } else {
         this.$axios
@@ -88,49 +87,38 @@ export default {
             name: this.data.name,
             description: this.data.description,
           })
-          .then(() => {
-            this.setupSuccess_added();
+          .then((response) => {
+            this.handleResponse(response, response.data.msg);
             setTimeout(() => {
               this.clearForm();
               this.$router.push("/roletable");
             }, 3000);
           })
-          .catch(() => {});
-        this.clearForm();
+          .catch((error) => {
+            this.handleError(error, error.msg);
+          });
       }
-    },
-    //fpr success login
-    setupfor_SuccessLogin() {
-      toast.success("login SuccessFully", {
-        position: "bottom-right",
-        autoClose: 2000,
-      });
-    },
-    // for facing a error
-    setupfor_error() {
-      toast.error("Something went wrong", {
-        position: "bottom-right",
-
-        autoClose: 2000,
-      });
     },
     // for clear the form
     clearForm() {
       this.data.email = "";
       this.data.password = "";
     },
-    // for success update
-    setupSuccess_update() {
-      toast.success("SuccessFully Updated", {
-        autoClose: 2000,
-        position: "bottom-right",
-      });
+    // this for show the backend success msg
+    handleResponse(response, successMessage) {
+      if (response.data.success) {
+        toast.success(successMessage, {
+          position: "bottom-right",
+          autoClose: 2000,
+        });
+      }
     },
-    // for success added
-    setupSuccess_added() {
-      toast.success("SuccessFully, You Added A Member  ", {
-        autoClose: 2000,
+    // this function work on the every error msg catch
+    handleError(error, defaultMessage) {
+      const errorMessage = error.response.data.msg || defaultMessage;
+      toast.error(errorMessage, {
         position: "bottom-right",
+        autoClose: 2000,
       });
     },
   },

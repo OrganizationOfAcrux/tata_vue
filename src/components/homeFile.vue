@@ -4,7 +4,6 @@
     <img alt="Vue logo" src="../assets/tata.png" id="img1" />
   </div>
 </template>
-
 <script>
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";

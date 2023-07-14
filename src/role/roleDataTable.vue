@@ -108,24 +108,23 @@ export default {
       this.$axios
         .get(url)
         .then((response) => {
-          console.log(response.data.data.data);
           this.users = response.data.data.data;
           // for taking links for paginanation
           this.urlLinks = response.data.data.links;
         })
         .catch((error) => {
-          console.error(error);
+          this.handleError(error, error.msg);
         });
     },
     // for delete
     deleteUsers(id) {
       this.$axios
         .delete(`http://127.0.0.1:8000/api/roles/${id}`)
-        .then(() => {
-          this.setupSuccess_deleted();
+        .then((response) => {
+          this.handleResponse(response, response.data.msg);
         })
-        .catch(() => {
-          this.setupErrordelete();
+        .catch((error) => {
+          this.handleError(error, error.msg);
         })
         .finally(() => {
           this.getData(this.url);
@@ -142,10 +141,10 @@ export default {
           if (index !== -1) {
             this.users.splice(index + 1, 0, { ...copiedUser });
           }
-          this.setupSuccess_copied();
+          this.handleResponse(response, response.data.msg);
         })
-        .catch(() => {
-          this.setupError();
+        .catch((error) => {
+          this.handleError(error, error.msg);
         })
         .finally(() => {
           this.getData(this.url);
@@ -166,32 +165,21 @@ export default {
         },
       });
     },
-    // for success deleted
-    setupSuccess_deleted() {
-      toast.success("Role deleted successfully.", {
-        autoClose: 2000,
-        position: "bottom-right",
-      });
+    // this for show the backend success msg
+    handleResponse(response, successMessage) {
+      if (response.data.success) {
+        toast.success(successMessage, {
+          position: "bottom-right",
+          autoClose: 2000,
+        });
+      }
     },
-    // for success copied
-    setupSuccess_copied() {
-      toast.success("Role copied successfully", {
-        autoClose: 2000,
+    // this function work on the every error msg catch
+    handleError(error, defaultMessage) {
+      const errorMessage = error.response.data.msg || defaultMessage;
+      toast.error(errorMessage, {
         position: "bottom-right",
-      });
-    },
-    // for the error
-    setupError() {
-      toast.error("Something went wrong", {
         autoClose: 2000,
-        position: "bottom-right",
-      });
-    },
-    // for the delete
-    setupErrordelete() {
-      toast.error("Role is in use.", {
-        autoClose: 2000,
-        position: "bottom-right",
       });
     },
   },

@@ -42,7 +42,11 @@
               placeholder="Search for St. Name ..."
               id="searchInput"
               style="width: 150%"
+              :class="{ error: selectedStudentError }"
             />
+            <p v-if="selectedStudentError" class="error-message">
+              First! Please select a Student Name .
+            </p>
             <div class="dropdown-content">
               <table>
                 <tr
@@ -68,17 +72,20 @@
             v-model="library.selectedClass"
             @change="sendSelectedClassToAPI"
             style="height: 2.4rem; width: 15rem"
+            :class="{ error: selectedClassError }"
           >
-            <!-- <option value="">Select a Class</option> -->
-            <option value="9" selected>9th</option>
+            <option value="">Select a Class</option>
+            <option value="9">9th</option>
             <option value="10">10th</option>
             <option value="11">11th</option>
             <option value="12">12th</option>
           </select>
+          <p v-if="selectedClassError" class="error-message">
+            Please select a class.
+          </p>
         </div>
         <!-- drop down end -->
         <!-- multiselect start -->
-
         <div style="margin-left: 10%">
           <label for="name" class="rolelabel">Subject:</label><br />
           <VueMultiselect
@@ -91,12 +98,10 @@
             label="subject"
             track-by="id"
             style="width: 17rem"
+            :class="{ error: subjectError }"
           ></VueMultiselect>
-          <p v-if="disableSubjects" class="disabled-message">
-            You select 2 subject, that's your limit for once!
-          </p>
-          <p v-else class="enabled-message" style="color: rgb(21, 66, 244)">
-            You can select maximum 2 subjects.
+          <p v-if="subjectError" class="error-message">
+            Please select at least one subject.
           </p>
         </div>
         <!-- multiselect end -->
@@ -207,6 +212,9 @@ export default {
   },
   data() {
     return {
+      selectedClassError: false,
+      subjectError: false,
+      selectedStudentError: false,
       users: [],
       books: [],
       Students: [],
@@ -259,6 +267,8 @@ export default {
   },
   methods: {
     onSelectSubject(selectedSubjects) {
+      // Reset subject error flag and message
+      this.subjectError = false;
       if (Array.isArray(selectedSubjects) && selectedSubjects.length > 0) {
         this.library.subjectId = selectedSubjects.map((subject) => subject.id);
       } else {
@@ -295,6 +305,8 @@ export default {
     },
     // for display selected name
     selectName(selectedStudent) {
+      // for remove error after select the name
+      this.selectedStudentError = false;
       this.library.searchname =
         selectedStudent.first_name + " " + selectedStudent.last_name;
       this.Students = [];
@@ -306,6 +318,8 @@ export default {
 
     // for the send selected class and selected name Id and get the response and fill in vuemultiselect dropdown
     sendSelectedClassToAPI() {
+      // Reset class error flag and message
+      this.selectedClassError = false;
       if (this.library.selectedClass) {
         const payload = {
           user_id: this.library.id,
@@ -333,31 +347,46 @@ export default {
 
     // for the post data to assign
     assignData() {
-      const payload = {
-        user_id: this.library.id,
-        book_ids: this.library.subjectId.map((subject) => subject.id),
-      };
+      if (!this.library.selectedClass) {
+        this.selectedClassError = true;
+      } else {
+        this.selectedClassError = false;
+      }
 
-      this.$axios
-        .post("http://127.0.0.1:8000/api/libraries/assigne", payload)
-        .then(() => {})
-        .catch(() => {});
-      this.cleantheinput();
-      setTimeout(() => {
-        this.bookData();
-        this.getData(this.url);
-      }, 1000);
+      if (this.library.subjectId.length === 0) {
+        this.subjectError = true;
+      } else {
+        this.subjectError = false;
+      }
+      if (this.library.id.length === 0) {
+        this.selectedStudentError = true;
+      } else {
+        this.selectedStudentError = false;
+      }
+
+      if (!this.selectedClassError && !this.subjectError) {
+        const payload = {
+          user_id: this.library.id,
+          book_ids: this.library.subjectId.map((subject) => subject.id),
+        };
+
+        this.$axios
+          .post("http://127.0.0.1:8000/api/libraries/assigne", payload)
+          .then(() => {})
+          .catch(() => {});
+        this.cleantheinput();
+        setTimeout(() => {
+          this.bookData();
+          this.getData(this.url);
+        }, 1000);
+      }
     },
     // for the receiveBook
     receiveBook(id) {
       this.$axios
         .delete(`http://127.0.0.1:8000/api/libraries/${id}`) // update the url
         .then((response) => {
-          this.handleResponse(
-            response,
-            response.data.msg,
-            "Failed to retrieve history"
-          );
+          this.handleResponse(response, response.data.msg);
         })
         .catch((error) => {
           // console.log(error, "Face a Error");
@@ -367,6 +396,7 @@ export default {
           this.getData(this.url);
           setTimeout(() => {
             this.bookData();
+            this.sendSelectedNameToAPIForHistory();
           }, 1000);
         });
     },
@@ -377,13 +407,9 @@ export default {
         .then((response) => {
           // console.log(response);
           this.users = response.data.data.data;
-
-          console.log(response.data.data.data);
           this.urlLinks = response.data.data.links;
-          console.log(response.data.data.links);
         })
         .catch((error) => {
-          // console.error(error);
           this.handleError(error, error.msg);
         });
     },
@@ -391,23 +417,17 @@ export default {
     sendSelectedNameToAPIForHistory() {
       if (this.library.searchname) {
         const user_id = this.library.id;
-
         this.$axios
           .get(`http://127.0.0.1:8000/api/libraries/history/${user_id}`)
           .then((response) => {
             this.historyData = response.data.data.libraries;
-            this.handleResponse(
-              response,
-              response.data.msg,
-              "Failed to retrieve history"
-            );
+            this.handleResponse(response, response.data.msg);
           })
           .catch((error) => {
             this.handleError(error, error.msg);
           });
       }
     },
-
     // this function work on the only print the date of history
     formatDate(dateString) {
       const date = new Date(dateString);
@@ -421,15 +441,9 @@ export default {
       this.library.subjectId = "";
     },
     // this for show the backend success msg
-    handleResponse(response, successMessage, defaultMessage) {
+    handleResponse(response, successMessage) {
       if (response.data.success) {
         toast.success(successMessage, {
-          position: "bottom-right",
-          autoClose: 2000,
-        });
-      } else {
-        const errorMessage = response.data.message || defaultMessage;
-        toast.error(errorMessage, {
           position: "bottom-right",
           autoClose: 2000,
         });
@@ -596,5 +610,13 @@ export default {
 
 .selected {
   background-color: #ddd;
+}
+.error {
+  border: 1px solid red;
+}
+
+.error-message {
+  color: red;
+  margin-top: 0.5rem;
 }
 </style>

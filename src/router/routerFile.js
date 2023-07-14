@@ -68,6 +68,7 @@ const router = createRouter({
     ]
 })
 
+// this for the with login no one open the with url
 router.beforeEach((to, from, next) => {
     const isLoggedIn = !!localStorage.getItem("storeData");
     const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);

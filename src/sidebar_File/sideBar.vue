@@ -59,7 +59,7 @@
         @click="button5"
         :class="{ green4: isHistoryPage }"
       >
-        History
+        Read
       </button> -->
       <!-- this is extra button -->
     </div>
@@ -168,8 +168,8 @@ export default {
     button() {
       this.$router.push("/userData");
       this.isUserDataPage = true;
-      this.isRolePage = false; // Add this line
-      this.isBookPage = false; // Add this line
+      this.isRolePage = false;
+      this.isBookPage = false;
       this.isBookLibraryPage = false;
       this.isHistoryPage = false;
     },
@@ -178,39 +178,40 @@ export default {
     button2() {
       this.$router.push("/roletable");
       this.isRolePage = true;
-      this.isUserDataPage = false; // Add this line
-      this.isBookPage = false; // Add this line
+      this.isUserDataPage = false;
+      this.isBookPage = false;
       this.isBookLibraryPage = false;
       this.isHistoryPage = false;
     },
     button3() {
       this.$router.push("/books");
       this.isBookPage = true;
-      this.isUserDataPage = false; // Add this line
-      this.isRolePage = false; // Add this line
+      this.isUserDataPage = false;
+      this.isRolePage = false;
       this.isBookLibraryPage = false;
       this.isHistoryPage = false;
     },
     button4() {
       this.$router.push("/libraryPage");
       this.isBookPage = false;
-      this.isUserDataPage = false; // Add this line
-      this.isRolePage = false; // Add this line
+      this.isUserDataPage = false;
+      this.isRolePage = false;
       this.isBookLibraryPage = true;
       this.isHistoryPage = false;
     },
     button5() {
       this.$router.push("/historyPage");
       this.isBookPage = false;
-      this.isUserDataPage = false; // Add this line
-      this.isRolePage = false; // Add this line
+      this.isUserDataPage = false;
+      this.isRolePage = false;
       this.isBookLibraryPage = false;
       this.isHistoryPage = true;
     },
     logout_User() {
       this.$axios
         .get("http://127.0.0.1:8000/api/logout")
-        .then(() => {
+        .then((response) => {
+          console.log(response);
           localStorage.removeItem("storeData");
           // for delete the window history after the
           window.history.replaceState({}, "", "/login");

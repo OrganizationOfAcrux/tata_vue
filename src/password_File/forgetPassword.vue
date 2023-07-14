@@ -46,16 +46,21 @@ export default {
           const token = response.data.data.token;
           this.$router.push(`/reset/${token}`);
         })
-        .catch(() => {
-          toast.error("Your email is not matched!", {
-            autoClose: 2000,
-            position: "bottom-right",
-          });
+        .catch((error) => {
+          this.handleError(error, error.msg);
         });
       this.clearForm();
     },
     clearForm() {
       this.data.email = "";
+    },
+    // this function work on the every error msg catch
+    handleError(error, defaultMessage) {
+      const errorMessage = error.response.data.msg || defaultMessage;
+      toast.error(errorMessage, {
+        position: "bottom-right",
+        autoClose: 2000,
+      });
     },
   },
 };

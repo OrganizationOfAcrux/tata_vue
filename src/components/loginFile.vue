@@ -73,28 +73,29 @@ export default {
           setTimeout(() => {
             this.$router.push("/home");
           }, 3000);
-          this.setupfor_SuccessLogin();
+          this.handleResponse(response, response.data.msg);
         })
-        .catch(() => {
-          this.setupfor_error();
+        .catch((error) => {
+          this.handleError(error, error.msg);
         })
         .finally(() => {
           this.clearForm();
         });
     },
-    // for the success toast
-    setupfor_SuccessLogin() {
-      toast.success("login SuccessFully", {
-        position: "bottom-right",
-
-        autoClose: 2000,
-      });
+    // this for show the backend success msg
+    handleResponse(response, successMessage) {
+      if (response.data.success) {
+        toast.success(successMessage, {
+          position: "bottom-right",
+          autoClose: 2000,
+        });
+      }
     },
-    // for the error toast
-    setupfor_error() {
-      toast.error("Something went wrong", {
+    // this function work on the every error msg catch
+    handleError(error, defaultMessage) {
+      const errorMessage = error.response.data.msg || defaultMessage;
+      toast.error(errorMessage, {
         position: "bottom-right",
-
         autoClose: 2000,
       });
     },

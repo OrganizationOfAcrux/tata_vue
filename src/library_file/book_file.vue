@@ -21,7 +21,6 @@
             Add
           </button>
         </div>
-
         <div class="button-container"></div>
       </div>
       <div class="bottom-section">
@@ -119,11 +118,11 @@ export default {
     deleteUsers(id) {
       this.$axios
         .delete(`http://127.0.0.1:8000/api/books/${id}`)
-        .then(() => {
-          this.setupSuccess_deleted();
+        .then((response) => {
+          this.handleResponse(response, response.data.msg);
         })
-        .catch(() => {
-          this.setupError();
+        .catch((error) => {
+          this.handleError(error, error.msg);
         })
         .finally(() => {
           this.getData(this.url);
@@ -143,18 +142,21 @@ export default {
     addBook() {
       this.$router.push("/addbook");
     },
-    // for success copied
-    setupSuccess_deleted() {
-      toast.success("Successfully Deleted", {
-        autoClose: 2000,
-        position: "bottom-right",
-      });
+    // this for show the backend success msg
+    handleResponse(response, successMessage) {
+      if (response.data.success) {
+        toast.success(successMessage, {
+          position: "bottom-right",
+          autoClose: 2000,
+        });
+      }
     },
-    // for the error
-    setupError() {
-      toast.error("Something went wrong", {
-        autoClose: 2000,
+    // this function work on the every error msg catch
+    handleError(error, defaultMessage) {
+      const errorMessage = error.response.data.msg || defaultMessage;
+      toast.error(errorMessage, {
         position: "bottom-right",
+        autoClose: 2000,
       });
     },
   },

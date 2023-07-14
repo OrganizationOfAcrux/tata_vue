@@ -68,7 +68,6 @@ export default {
           subject: "",
           available: "",
         },
-
         editingId: "",
       };
     }
@@ -82,7 +81,6 @@ export default {
       this.data.available = this.$route.query.available || "";
       this.isEditing = true;
     }
-    // this.getData();
   },
   methods: {
     // for the store or update the data
@@ -94,8 +92,8 @@ export default {
             subject: this.data.subject,
             available: this.data.available,
           })
-          .then(() => {
-            this.setupSuccess_update();
+          .then((response) => {
+            this.handleResponse(response, response.data.msg);
             setTimeout(() => {
               this.$router.push("/books");
               this.clearForm();
@@ -109,16 +107,16 @@ export default {
             available: this.data.available,
           })
           .then((response) => {
-            console.log(response);
-            (this.isHide = true), this.setupSuccess_added();
+            (this.isHide = true),
+              this.handleResponse(response, response.data.msg);
             setTimeout(() => {
               this.clearForm();
 
               this.$router.push("/books");
             }, 3000);
           })
-          .catch((Response) => {
-            console.log(Response);
+          .catch((error) => {
+            this.handleError(error, error.msg);
           });
       }
     },
@@ -128,18 +126,21 @@ export default {
         (this.data.subject = ""),
         (this.data.available = "");
     },
-    // for the success update
-    setupSuccess_update() {
-      toast.success("SuccessFully Updated", {
-        autoClose: 2000,
-        position: "bottom-right",
-      });
+    // this for show the backend success msg
+    handleResponse(response, successMessage) {
+      if (response.data.success) {
+        toast.success(successMessage, {
+          position: "bottom-right",
+          autoClose: 2000,
+        });
+      }
     },
-    // for facing a error
-    setupSuccess_added() {
-      toast.success("SuccessFully, You Added A Book  ", {
-        autoClose: 2000,
+    // this function work on the every error msg catch
+    handleError(error, defaultMessage) {
+      const errorMessage = error.response.data.msg || defaultMessage;
+      toast.error(errorMessage, {
         position: "bottom-right",
+        autoClose: 2000,
       });
     },
   },
